@@ -1,0 +1,883 @@
+{
+    "domain_id": [
+        {
+            "value": "id"
+        },
+        {
+            "value": "roid"
+        },
+        {
+            "value": "domain id"
+        }
+    ],
+    "domain_name": [
+        {
+            "value": "domain"
+        },
+        {
+            "value": "domain name"
+        }
+    ],
+    "domain_status": [
+        {
+            "value": "status"
+        },
+        {
+            "value": "domain status"
+        },
+        {
+            "value": "registration status"
+        },
+        {
+            "value": "query status"
+        }
+    ],
+    "domain_dnssec": [
+        {
+            "value": "dnssec"
+        },
+        {
+            "value": "domain dnssec"
+        },
+        {
+            "value": "registrar dnssec"
+        },
+        {
+            "value": "signing key"
+        },
+        {
+            "value": "domain signed"
+        }
+    ],
+    "whois_server": [
+        {
+            "value": "whois"
+        },
+        {
+            "value": "whois server"
+        },
+        {
+            "value": "registrar whois server"
+        }
+    ],
+    "name_servers": [
+        {
+            "value":"Serveur de noms",
+            "tld":"ga"
+        },
+        {
+            "value": "Servidor",
+            "tld":"uy"
+        },
+        {
+            "value": "Informação do Nameserver",
+            "tld":"pt"
+        },
+        {
+            "value": "Name server #1",
+            "tld":"gm"
+        },
+        {
+            "value": "Name server #2",
+            "tld":"gm"
+        },
+        {
+            "value": "Name server #3",
+            "tld":"gm"
+        },
+        {
+            "value": "DNS Hostnames",
+            "tld":"tt"
+        },
+        {
+            "value": "Nombre del Servidor Primario",
+            "tld":"pa"
+        },
+        {
+            "value": "Nombre del Servidor Secundario",
+            "tld":"pa"
+        },
+        {
+            "value": "NS 1",
+            "tld":"tm"
+        },
+        {
+            "value": "NS 2",
+            "tld":"tm"
+        },
+        {
+            "value": "Primary host name",
+            "tld":"to"
+        },
+        {
+            "value": "Secondary host name",
+            "tld":"to"
+        },
+        {
+            "value": "Primary server.........",
+            "tld":"xn--80ao21a"
+        },
+        {
+            "value": "Secondary server.......:",
+            "tld":"xn--80ao21a"
+        },
+        {
+            "value": "Primary server",
+            "tld":"kz"
+        },
+        {
+            "value": "Secondary server",
+            "tld":"kz"
+        },
+        {
+            "value": "dns"
+        },
+        {
+            "value": "nserver"
+        },
+        {
+            "value": "nserver info",
+            "tld":"ee"
+        },
+        {
+            "value": "name server"
+        },
+        {
+            "value": "name servers"
+        },
+        {
+            "value": "nameserver"
+        },
+        {
+            "value": "nameservers"
+        },
+        {
+            "value": "name servers information"
+        },
+        {
+            "value": "host name"
+        },
+        {
+            "value": "hostname"
+        },
+        {
+            "value": "domain nameservers"
+        },
+        {
+            "value": "domain name servers"
+        },
+        {
+            "value": "domain servers in listed order"
+        }
+    ],
+    "created_date": [
+        {
+            "value":"Domain creation date",
+            "tld":"hm"
+        },
+        {
+            "value":"Activation",
+            "tld":"tg"
+        },
+        {
+            "value": "Fecha de Alta",
+            "tld":"uy"
+        },
+        {
+            "value": "Data de Registo",
+            "tld" :"pt"
+        },
+        {
+            "value": "created"
+        },
+        {
+            "value": "registered"
+        },
+        {
+            "value": "created on"
+        },
+        {
+            "value": "create date"
+        },
+        {
+            "value": "created date"
+        },
+        {
+            "value": "creation date"
+        },
+        {
+            "value": "domain registration date"
+        },
+        {
+            "value": "registration date"
+        },
+        {
+            "value": "domain create date"
+        },
+        {
+            "value": "domain created"
+        },
+        {
+            "value": "domain name commencement date"
+        },
+        {
+            "value": "registered date"
+        },
+        {
+            "value": "registered on"
+        },
+        {
+            "value": "registration time"
+        },
+        {
+            "value": "first registration date"
+        },
+        {
+            "value": "domain record activated"
+        },
+        {
+            "value": "record created on"
+        },
+        {
+            "value": "domain registered"
+        },
+        {
+            "value": "record created"
+        },
+        {
+            "value": "domain dateregistered"
+        },
+        {
+            "value": "登録年月日",
+            "tld":"jp"
+        },
+        {
+            "value": "date de création",
+            "tld":"sn"
+        },
+        {
+            "value": "fecha de creación",
+            "tld":"pa"
+        },
+        {
+            "value": "fecha registro",
+            "tld":"sv"
+        }
+    ],
+    "updated_date": [
+        {
+            "value":"Modified Date",
+            "tld":"sg"
+        },
+        {
+            "value": "Record last updated on",
+            "tld":"kg"
+        },
+        {
+            "value": "domain changed",
+            "tld" :"ar"
+        },
+        {
+            "value": "updated",
+            "tld":"lv"
+        },
+        {
+            "value": "modified"
+        },
+        {
+            "value": "changed"
+        },
+        {
+            "value": "update date"
+        },
+        {
+            "value": "updated date"
+        },
+        {
+            "value": "updated on"
+        },
+        {
+            "value": "last update"
+        },
+        {
+            "value": "last updated"
+        },
+        {
+            "value": "last updated on"
+        },
+        {
+            "value": "last modified"
+        },
+        {
+            "value": "last updated date"
+        },
+        {
+            "value": "domain last updated date"
+        },
+        {
+            "value": "domain record last updated"
+        },
+        {
+            "value": "domain datelastmodified"
+        },
+        {
+            "value": "modification date"
+        },
+        {
+            "value": "最終更新",
+            "tld":"jp"
+        },
+        {
+            "value": "dernière modification",
+            "tld":"sn"
+        },
+        {
+            "value": "fecha de Última actualización",
+            "tld":"pa"
+        },
+        {
+            "value": "record modification",
+            "tld":"nr"
+        },
+        {
+            "value": "fecha de vencimiento",
+            "tld":"sv"
+        }
+    ],
+    "expired_date": [
+        {
+            "value":"Domain expiration date",
+            "tld":"hm"
+        },
+        {
+            "value":"Expiration",
+            "tld":"tg"
+        },
+        {
+            "value": "Valid Until",
+            "tld":"sk"
+        },
+        {
+            "value":"date d expiration",
+            "tld":"ga"
+        },
+        {
+            "value": "Expiración",
+            "tld":"gt"
+        },
+        {
+            "value": "Data de Expiração",
+            "tld" :"pt"
+        },
+        {
+            "value": "expire"
+        },
+        {
+            "value": "expires"
+        },
+        {
+            "value": "expires on",
+            "tld":"md"
+        },
+        {
+            "value": "paid till"
+        },
+        {
+            "value": "expire date"
+        },
+        {
+            "value": "expired date"
+        },
+        {
+            "value": "expiration date"
+        },
+        {
+            "value": "expiration on"
+        },
+        {
+            "value": "registrar registration expiration date"
+        },
+        {
+            "value": "domain expiration date"
+        },
+        {
+            "value": "expiry date"
+        },
+        {
+            "value": "expiration time"
+        },
+        {
+            "value": "renewal date"
+        },
+        {
+            "value": "domain expire"
+        },
+        {
+            "value": "domain expires"
+        },
+        {
+            "value": "record expires on"
+        },
+        {
+            "value": "record will expire on"
+        },
+        {
+            "value": "状態",
+            "tld":"jp"
+        },
+        {
+            "value": "date d'expiration",
+            "tld":"sn"
+        },
+        {
+            "value": "fecha de renovación",
+            "tld":"pa"
+        }
+    ],
+    "transfer_date": [
+        {
+            "value": "Transfer Date"
+        }
+    ],
+    "referral_url": [
+        {
+            "value": "referral url"
+        },
+        {
+            "value": "registrar url"
+        },
+        {
+            "value": "registrar www"
+        },
+        {
+            "value": "registrar web"
+        },
+        {
+            "value": "registrar website"
+        },
+        {
+            "value": "registration service url"
+        }
+    ],
+    "registrant_id": [
+        {
+            "value": "registrant c"
+        },
+        {
+            "value": "registrant id"
+        },
+        {
+            "value": "registrant iana id"
+        },
+        {
+            "value": "registrant contact id"
+        },
+        {
+            "value": "registrant register number"
+        },
+        {
+            "value": "registrant id number"
+        },
+        {
+            "value": "registrant nic hdl"
+        },
+        {
+            "value": "registrant nic handle"
+        },
+        {
+            "value": "registrant org id"
+        }
+    ],
+    "registrant_name": [
+        {
+            "value": "Registrant Nom",
+            "tld":"sn"
+        },
+        {
+            "value": "registrantname",
+            "tld":"ml"
+        },
+        {
+            "value": "Nombre",
+            "tld":"uy"
+        },
+        {
+            "value": "Registrant",
+            "tld":"cn"
+        },
+        {
+            "value": "registrant name"
+        },
+        {
+            "value": "registrant person"
+        },
+        {
+            "value": "registrant contact"
+        },
+        {
+            "value": "registrant contact name"
+        },
+        {
+            "value": "registrant given name"
+        },
+        {
+            "value": "registrant holder name"
+        },
+        {
+            "value": "registrant holder english name"
+        },
+        {
+            "value": "registrant service provider"
+        },
+        {
+            "value": "contacto administrativo",
+            "tld":"sv"
+        }
+    ],
+    "registrant_organization": [
+        {
+            "value": "registrant org"
+        },
+        {
+            "value": "registrant organization"
+        },
+        {
+            "value": "registrant organization name"
+        },
+        {
+            "value": "registrant contact organization"
+        },
+        {
+            "value": "registrant organisation"
+        },
+        {
+            "value": "registrant contact organisation"
+        },
+        {
+            "value": "registrant company name"
+        },
+        {
+            "value": "registrant company english name"
+        },
+        {
+            "value":"Contact organization"
+        }
+    ],
+    "registrant_street": [
+        {
+            "value": "Registrant Adresse",
+            "tld":"sn"
+        },
+        {
+            "value": "RegistrantStreet"
+        },
+        {
+            "value": "registrant address"
+        },
+        {
+            "value": "registrant address1"
+        },
+        {
+            "value": "registrant street"
+        },
+        {
+            "value": "registrant street1"
+        },
+        {
+            "value": "registrant street address"
+        },
+        {
+            "value": "registrant contact address"
+        },
+        {
+            "value": "registrant contact address1"
+        },
+        {
+            "value": "registrant contact street"
+        },
+        {
+            "value": "registrant contact street1"
+        },
+        {
+            "value": "registrant s address"
+        },
+        {
+            "value": "registrant s address1"
+        },
+        {
+            "value": "registrant postal address"
+        },
+        {
+            "value": "registrant postal address1"
+        }
+    ],
+    "registrant_city": [
+        {
+            "value": "registrant city"
+        },
+        {
+            "value": "registrant contact city"
+        },
+        {
+            "value": "registrantcity",
+            "tld":"ml"
+        }
+    ],
+    "registrant_state_province": [
+        {
+            "value": "registrant state province"
+        },
+        {
+            "value": "registrant state"
+        },
+        {
+            "value": "registrant contact state province"
+        },
+        {
+            "value": "RegistrantState/Province",
+            "tld":"ml"
+        }
+    ],
+    "registrant_zip": [
+        {
+            "value": "Registrant Code postal",
+            "tld":"sn"
+        },
+        {
+            "value": "registrant zipcode"
+        },
+        {
+            "value": "registrant zip code"
+        },
+        {
+            "value": "registrant postal code"
+        },
+        {
+            "value": "registrant contact postal code"
+        },
+        {
+            "value": "registrantpostal code",
+            "tld":"ml"
+        }
+    ],
+    "registrant_country": [
+        {
+            "value": "registrant country"
+        },
+        {
+            "value": "registrant country economy"
+        },
+        {
+            "value": "registrant contact country"
+        },
+        {"value":"registrantcountry","tld":"ml"}
+    ],
+    "registrant_phone": [
+        {
+            "value": "Registrant Téléphone",
+            "tld":"sn"
+        },
+        {
+            "value": "registrant phone"
+        },
+        {
+            "value": "registrant phone number"
+        },
+        {
+            "value": "registrant contact phone"
+        },
+        {
+            "value": "registrant contact phone number"
+        },
+        {
+            "value": "registrant abuse contact phone"
+        },
+        {
+            "value": "registrantphone",
+            "tld":"ml"
+        },
+        {
+            "value": "Teléfono",
+            "tld":"sv"
+        }
+    ],
+    "registrant_phone_ext": [
+        {
+            "value": "registrant phone ext"
+        },
+        {
+            "value": "registrant contact phone ext"
+        }
+    ],
+    "registrant_fax": [
+        {
+            "value": "registrant fax"
+        },
+        {
+            "value": "registrant fax no"
+        },
+        {
+            "value": "registrant fax number"
+        },
+        {
+            "value": "registrant facsimile"
+        },
+        {
+            "value": "registrant facsimile number"
+        },
+        {
+            "value": "registrant contact fax"
+        },
+        {
+            "value": "registrant contact fax number"
+        },
+        {
+            "value": "registrant contact facsimile"
+        },
+        {
+            "value": "registrant contact facsimile number"
+        }
+    ],
+    "registrant_fax_ext": [
+        {
+            "value": "registrant fax ext"
+        },
+        {
+            "value": "registrant contact fax ext"
+        }
+    ],
+    "registrant_email": [
+        {
+            "value": "Registrant Courriel",
+            "tld":"sn"
+        },
+        {
+            "value":"Correo Electr&oacute;nico",
+            "tld":"uy"
+        },
+        {
+            "value": "registrant mail"
+        },
+        {
+            "value": "registrant email"
+        },
+        {
+            "value": "registrant e mail"
+        },
+        {
+            "value": "registrant email address"
+        },
+        {
+            "value": "registrant contact mail"
+        },
+        {
+            "value": "registrant contact email"
+        },
+        {
+            "value": "registrant contact e mail"
+        },
+        {
+            "value": "registrant abuse contact email"
+        },
+        {
+            "value": "correo electrónico",
+            "tld":"sv"
+        },
+        {
+            "value": "registrantemail",
+            "tld":"ml"
+        },
+        {
+            "value": "Contact email",
+            "tld":"lt"
+        }
+    ],
+    "registrar_name":[
+        {
+            "value": "registrar"
+        },
+        {
+            "value": "registrar name",
+            "tld":"prehandle"
+        }
+    ],
+    "registrar_ianaid":[
+        {
+            "value": "Registrar IANA ID"
+        }
+    ],
+    
+    "registrar_email":[
+        {
+            "value": "registrar abuse contact email"
+        },
+        {
+            "value":"Registrar email",
+            "tld":"lt"
+        }
+    ],
+    "registrar_phone":[
+        {
+            "value": "registrar abuse contact phone"
+        }
+    ],
+    "registrar_reseller":[
+        {
+            "value": "Reseller",
+            "tld":"cm"
+        }
+    ],
+    "generic": {
+        "registrar": [
+            "registrar",
+            "registrar name",
+            "sponsoring registrar",
+            "registered through"
+        ],
+        "whoisServer": [
+            "whois server",
+            "registrar whois server"
+        ],
+        "nameServers": [
+            "name server",
+            "nameserver",
+            "nserver",
+            "name servers",
+            "nameservers"
+        ],
+        "creationDate": [
+            "created",
+            "creation date",
+            "registered on",
+            "registration date"
+        ],
+        "updatedDate": [
+            "updated",
+            "last updated",
+            "last modified",
+            "changed"
+        ],
+        "expiryDate": [
+            "expires",
+            "expiry date",
+            "expiration date",
+            "registry expiry date"
+        ],
+        "registrantName": [
+            "registrant name",
+            "registrant"
+        ],
+        "registrantOrganization": [
+            "registrant organization",
+            "registrant org"
+        ],
+        "registrantEmail": [
+            "registrant email",
+            "email"
+        ],
+        "status": [
+            "status",
+            "domain status"
+        ]
+    }
+}

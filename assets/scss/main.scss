@@ -1,0 +1,386 @@
+// 使用新的@use规则代替弃用的@import
+@import './variables';
+:root {
+  --primary-color: #{$primary-color};
+  --secondary-color: #{$secondary-color};
+  --success-color: #{$success-color};
+  --error-color: #{$error-color};
+  --warning-color: #{$warning-color};
+  --info-color: #{$info-color};
+  --body-bg: #{$body-bg};
+  --text-color: #{$text-color};
+  --border-color: #{$border-color};
+  --card-bg: #{$card-bg};
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --card-text-color: #{$text-color};
+  --input-bg: #{$input-bg};
+  --input-border: #{$primary-color};
+  --input-focus-border: #{$primary-color};
+  --button-primary-bg: #{$primary-color};
+  --button-primary-text: #111111;
+  --button-secondary-bg: #{$border-color};
+  --button-secondary-text: #{$text-color};
+  --header-bg: #{$header-bg};
+  --footer-bg: #{$footer-bg};
+  --hover-color: #{$hover-color};
+  --muted-text: #{$text-muted};
+  --divider-color: #{$border-color};
+}
+
+// 定义亮色主题变量
+body.light-theme {
+  --body-bg: #f5f5f5;
+  --text-color: #333333;
+  --border-color: #e0e0e0;
+  --card-bg: #ffffff;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --card-text-color: #333333;
+  --input-bg: #ffffff;
+  --header-bg: #ffffff;
+  --footer-bg: #ffffff;
+  --muted-text: #777777;
+  --divider-color: #e0e0e0;
+}
+
+body {
+  font-family: $font-family-base;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--body-bg);
+  margin: 0;
+  padding: 0;
+  transition: $transition-base;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  
+  &:hover {
+    color: var(--hover-color);
+    text-decoration: none;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-color);
+}
+
+h1 {
+  font-size: $font-size-4xl;
+}
+
+h2 {
+  font-size: $font-size-3xl;
+}
+
+h3 {
+  font-size: $font-size-2xl;
+}
+
+.w-button {
+    padding: 1rem 2rem;
+    background-color: var(--primary-color);
+    color: #000;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    
+    &:hover {
+      background-color: var(--hover-color);
+    }
+    
+    &:disabled {
+      background-color: #444;
+      color: #888;
+      cursor: not-allowed;
+    }
+}
+
+.w-input {
+  font-family: inherit;
+  font-size: $font-size-base;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: $border-radius;
+  color: var(--text-color);
+  padding: $spacing-2;
+  transition: border-color 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.25);
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-4;
+}
+
+/* Cards & Sections */
+.card {
+  background-color: var(--card-bg);
+  border-radius: $border-radius-lg;
+  box-shadow: var(--card-shadow);
+  padding: $spacing-4;
+  border: 1px solid var(--border-color);
+}
+
+/* 全局统一卡片样式 */
+.standard-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: var(--card-shadow);
+  color: var(--card-text-color);
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* 卡片内标题样式 */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--card-text-color);
+  }
+  
+  /* 卡片内文本样式 */
+  p, span, div {
+    color: var(--card-text-color);
+  }
+  
+  /* 卡片内链接样式 */
+  a:not(.button) {
+    color: var(--primary-color);
+    
+    &:hover {
+      color: var(--hover-color);
+    }
+  }
+}
+
+.section {
+  padding: $spacing-8 0;
+}
+
+/* Dividers */
+hr {
+  border: none;
+  border-top: 1px solid var(--divider-color);
+  margin: $spacing-6 0;
+}
+
+/* 常用通用类 */
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-1 {
+  gap: $spacing-1;
+}
+
+.gap-2 {
+  gap: $spacing-2;
+}
+
+.gap-4 {
+  gap: $spacing-4;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.mt-1 {
+  margin-top: $spacing-1;
+}
+
+.mt-2 {
+  margin-top: $spacing-2;
+}
+
+.mt-4 {
+  margin-top: $spacing-4;
+}
+
+.mb-1 {
+  margin-bottom: $spacing-1;
+}
+
+.mb-2 {
+  margin-bottom: $spacing-2;
+}
+
+.mb-4 {
+  margin-bottom: $spacing-4;
+}
+
+.p-2 {
+  padding: $spacing-2;
+}
+
+.p-4 {
+  padding: $spacing-4;
+}
+
+.rounded {
+  border-radius: $border-radius;
+}
+
+.rounded-lg {
+  border-radius: $border-radius-lg;
+}
+
+.shadow {
+  box-shadow: var(--card-shadow);
+}
+
+.bg-card {
+  background-color: var(--card-bg);
+}
+
+.text-success {
+  color: var(--success-color);
+}
+
+.text-error {
+  color: var(--error-color);
+}
+
+.text-warning {
+  color: var(--warning-color);
+}
+
+.text-info {
+  color: var(--info-color);
+}
+
+.text-muted {
+  color: var(--muted-text);
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: $spacing-4 0;
+  color: var(--text-color);
+  
+  th {
+    background-color: #222222;
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  tr:hover {
+    background-color: rgba($primary-color, 0.05);
+  }
+}
+
+@include responsive(md) {
+  h1 {
+    font-size: $font-size-2xl;
+  }
+  
+  h2 {
+    font-size: $font-size-xl;
+  }
+  
+  h3 {
+    font-size: $font-size-lg;
+  }
+}
+
+/* 全局滚动条样式 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--body-bg);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba($primary-color, 0.5);
+  border-radius: 4px;
+  border: 2px solid var(--body-bg);
+  
+  &:hover {
+    background: $primary-color;
+  }
+}
+
+/* 暗色主题滚动条 */
+:global(.dark-theme) {
+  ::-webkit-scrollbar-track {
+    background: #1a1a1a;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba($primary-color, 0.6);
+    border: 2px solid #1a1a1a;
+    
+    &:hover {
+      background: $primary-color;
+    }
+  }
+}
+
+/* 亮色主题滚动条 */
+:global(.light-theme) {
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba($primary-color, 0.4);
+    border: 2px solid #f1f1f1;
+    
+    &:hover {
+      background: $primary-color;
+    }
+  }
+}
