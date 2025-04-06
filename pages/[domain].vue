@@ -134,9 +134,15 @@ const whoisDisplayData = computed<WhoisDisplayData>(() => {
         // 使用辅助函数生成标签
         tags = generateDomainTags(
             domain.value,
-            data.creationDate || formatted.domain?.created_date,
-            data.expiryDate || formatted.domain?.expired_date,
-            data.premium,
+            {
+                creationDate: data.creationDate || formatted.domain?.created_date,
+                expirationDate: data.expiryDate || formatted.domain?.expired_date,
+                updatedDate: data.updatedDate || formatted.domain?.updated_date,
+                nameServers: data.nameServers || formatted.domain?.name_servers,
+                isPremium: data.premium,
+                status: data.status,
+                domainStatus: domainStatus
+            },
             t
         );
     }

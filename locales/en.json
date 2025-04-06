@@ -346,6 +346,24 @@
     "tech": "Tech",
     "techDesc": "Technology-related new TLD",
     "restricted": "Restricted",
-    "restrictedDesc": "Domain requiring specific qualification to register"
+    "restrictedDesc": "Domain requiring specific qualification to register",
+    "hyphen": "Hyphenated",
+    "hyphenDesc": "Domain contains hyphens",
+    "palindrome": "Palindrome",
+    "palindromeDesc": "Domain reads the same forward and backward",
+    "locked": "Locked",
+    "lockedDesc": "Domain is locked against transfers or deletion",
+    "redemption": "Redemption",
+    "redemptionDesc": "Domain is in redemption period and can be recovered",
+    "brand": "Brand",
+    "brandDesc": "Domain has potential brand value",
+    "noNameServer": "No DNS",
+    "noNameServerDesc": "No nameservers configured",
+    "cloudflare": "Cloudflare",
+    "cloudflareDesc": "Using Cloudflare DNS services",
+    "aws": "AWS DNS",
+    "awsDesc": "Using Amazon AWS DNS services",
+    "google": "Google DNS",
+    "googleDesc": "Using Google DNS services"
   }
 } 

@@ -302,6 +302,42 @@ checkFavoriteStatus();
                 background-color: #8c8c8c;
                 color: white;
             }
+
+            // 额外扩展的标签样式
+            &.tag-hyphen {
+                background-color: #096dd9;
+                color: white;
+            }
+            
+            &.tag-palindrome {
+                background-color: #c41d7f;
+                color: white;
+            }
+            
+            &.tag-locked {
+                background-color: #389e0d;
+                color: white;
+            }
+            
+            &.tag-redemption {
+                background-color: #d4380d;
+                color: white;
+            }
+            
+            &.tag-brand {
+                background-color: #7cb305;
+                color: white;
+            }
+            
+            &.tag-nonameserver {
+                background-color: #d48806;
+                color: white;
+            }
+            
+            &.tag-dns {
+                background-color: #0958d9;
+                color: white;
+            }
         }
     }
 

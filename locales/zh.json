@@ -347,6 +347,24 @@
     "tech": "科技域名",
     "techDesc": "科技类新顶级域名",
     "restricted": "限制域名",
-    "restrictedDesc": "需特定资质才能注册的受限域名"
+    "restrictedDesc": "需特定资质才能注册的受限域名",
+    "hyphen": "连字符",
+    "hyphenDesc": "包含连字符的域名",
+    "palindrome": "回文",
+    "palindromeDesc": "正反读相同的域名",
+    "locked": "已锁定",
+    "lockedDesc": "域名已锁定，防止被转移或删除",
+    "redemption": "赎回期",
+    "redemptionDesc": "域名处于赎回期，可以高价赎回",
+    "brand": "品牌域名",
+    "brandDesc": "可能具有品牌价值的域名",
+    "noNameServer": "无DNS",
+    "noNameServerDesc": "未设置名称服务器",
+    "cloudflare": "Cloudflare",
+    "cloudflareDesc": "使用Cloudflare DNS服务",
+    "aws": "AWS DNS",
+    "awsDesc": "使用亚马逊AWS DNS服务",
+    "google": "Google DNS",
+    "googleDesc": "使用谷歌DNS服务"
   }
 }
