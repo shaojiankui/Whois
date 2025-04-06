@@ -16,6 +16,18 @@
                 ★
             </button>
         </div>
+        
+        <!-- 域名标签区域 -->
+        <div class="domain-tags" v-if="data.tags && data.tags.length > 0">
+            <span v-for="(tag, index) in data.tags" 
+                  :key="index" 
+                  class="domain-tag" 
+                  :class="tag.class"
+                  :title="tag.description">
+                {{ tag.label }}
+            </span>
+        </div>
+
         <div class="whois-content">
 
 
@@ -188,6 +200,110 @@ checkFavoriteStatus();
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     position: relative;
     /* 添加相对定位，使按钮可以绝对定位 */
+
+    // 域名标签样式
+    .domain-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 12px 16px 0;
+        
+        .domain-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: default;
+            
+            // 标签样式类型 
+            &.tag-expired {
+                background-color: #ff4d4f;
+                color: white;
+            }
+            
+            &.tag-renewal {
+                background-color: #faad14;
+                color: white;
+            }
+            
+            &.tag-new {
+                background-color: #52c41a;
+                color: white;
+            }
+            
+            &.tag-longterm {
+                background-color: #1890ff;
+                color: white;
+            }
+            
+            &.tag-region {
+                background-color: #722ed1;
+                color: white;
+            }
+            
+            &.tag-premium {
+                background-color: #eb2f96;
+                color: white;
+            }
+            
+            &.tag-info {
+                background-color: #8c8c8c;
+                color: white;
+            }
+
+            // 新增标签样式
+            &.tag-brandnew {
+                background-color: #13c2c2;
+                color: white;
+            }
+
+            &.tag-vintage {
+                background-color: #722ed1;
+                color: white;
+            }
+
+            &.tag-renewed {
+                background-color: #52c41a;
+                color: white;
+            }
+
+            &.tag-short {
+                background-color: #fa8c16;
+                color: white;
+            }
+
+            &.tag-long {
+                background-color: #fa541c;
+                color: white;
+            }
+
+            &.tag-numeric {
+                background-color: #2f54eb;
+                color: white;
+            }
+
+            &.tag-alphanumeric {
+                background-color: #1890ff;
+                color: white;
+            }
+
+            &.tag-popular {
+                background-color: #fa8c16;
+                color: white;
+            }
+
+            &.tag-tech {
+                background-color: #1890ff;
+                color: white;
+            }
+
+            &.tag-restricted {
+                background-color: #8c8c8c;
+                color: white;
+            }
+        }
+    }
 
     .whois-header {
         padding: 1rem;

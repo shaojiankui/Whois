@@ -53,7 +53,8 @@ import { useRoute, useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n';
 import WhoisDisplay from '~/components/WhoisDisplay.vue';
-import type { WhoisDisplayData } from '~/types/whois';
+import type { WhoisDisplayData, WhoisTag } from '~/types/whois';
+import { generateDomainTags } from '~/utils/domain-tags';
 import { apiGet } from '~/utils/api';
 
 // i18n setup
@@ -122,6 +123,24 @@ const whoisDisplayData = computed<WhoisDisplayData>(() => {
         });
     }
 
+    // 生成域名标签
+    let tags: WhoisTag[] = [];
+
+    // 检查是否已经有标签数据
+    if (data.tags && Array.isArray(data.tags)) {
+        // 使用服务器返回的标签
+        tags = [...data.tags];
+    } else {
+        // 使用辅助函数生成标签
+        tags = generateDomainTags(
+            domain.value,
+            data.creationDate || formatted.domain?.created_date,
+            data.expiryDate || formatted.domain?.expired_date,
+            data.premium,
+            t
+        );
+    }
+
     return {
         expirationDate: formatDate(data.expiryDate || formatted.domain?.expired_date),
         updatedDate: formatDate(data.updatedDate || formatted.domain?.updated_date),
@@ -133,7 +152,8 @@ const whoisDisplayData = computed<WhoisDisplayData>(() => {
         nameServers: data.nameServers || formatted.domain?.name_servers,
         dnssec: data.dnssec || formatted.domain?.dnssec,
         hasMoreInfo: !!(data.nameServers?.length || data.dnssec || formatted.registrant),
-        registrant: formatted.registrant
+        registrant: formatted.registrant,
+        tags: tags
     };
 });
 

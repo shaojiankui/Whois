@@ -94,4 +94,5 @@ export interface WhoisDisplayData {
   dnssec?: string;
   hasMoreInfo?: boolean;
   registrant?: WhoisContact;
+  tags?: WhoisTag[];
 } 
