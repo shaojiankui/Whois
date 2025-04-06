@@ -2,16 +2,16 @@
   <header class="header">
     <div class="container">
       <div class="logo">
-        <NuxtLink to="/" class="logo-link">
+        <NuxtLink :to="localePath('/')" class="logo-link">
           <span class="logo-text">{{ $t('header.title') }}</span>
         </NuxtLink>
       </div>
       
       <nav class="nav-desktop">
-        <NuxtLink :to="'/'" class="nav-link">{{ $t('header.home') }}</NuxtLink>
-        <NuxtLink :to="'/bulk-check'" class="nav-link">{{ $t('header.bulkCheck') }}</NuxtLink>
-        <NuxtLink :to="'/tld-list'" class="nav-link">{{ $t('header.tldList') }}</NuxtLink>
-        <NuxtLink to="/tld-extract" class="nav-link">{{ $t('header.tldExtract') }}</NuxtLink>
+        <NuxtLink :to="localePath('/')" class="nav-link">{{ $t('header.home') }}</NuxtLink>
+        <NuxtLink :to="localePath('/bulk-check')" class="nav-link">{{ $t('header.bulkCheck') }}</NuxtLink>
+        <NuxtLink :to="localePath('/tld-list')" class="nav-link">{{ $t('header.tldList') }}</NuxtLink>
+        <NuxtLink :to="localePath('/tld-extract')" class="nav-link">{{ $t('header.tldExtract') }}</NuxtLink>
       </nav>
       
       <div class="right-actions">
@@ -29,17 +29,17 @@
               <div class="avatar">{{ userInitials }}</div>
               <span v-if="!isMobile">{{ userName }}</span>
               <div class="user-dropdown" v-if="showUserMenu">
-                <NuxtLink to="/profile" class="dropdown-item">{{ $t('user.profile') }}</NuxtLink>
-                <NuxtLink to="/favorites" class="dropdown-item">{{ $t('user.favorites') }}</NuxtLink>
-                <NuxtLink to="/history" class="dropdown-item">{{ $t('user.history') }}</NuxtLink>
-                <NuxtLink to="/settings" class="dropdown-item">{{ $t('user.settings') }}</NuxtLink>
+                <NuxtLink :to="localePath('/profile')" class="dropdown-item">{{ $t('user.profile') }}</NuxtLink>
+                <NuxtLink :to="localePath('/favorites')" class="dropdown-item">{{ $t('user.favorites') }}</NuxtLink>
+                <NuxtLink :to="localePath('/history')" class="dropdown-item">{{ $t('user.history') }}</NuxtLink>
+                <NuxtLink :to="localePath('/settings')" class="dropdown-item">{{ $t('user.settings') }}</NuxtLink>
                 <button @click="logout" class="dropdown-item logout">{{ $t('header.logout') }}</button>
               </div>
             </div>
           </template>
           <template v-else>
-            <NuxtLink to="/login" class="auth-link">{{ $t('header.login') }}</NuxtLink>
-            <NuxtLink to="/register" class="auth-button">{{ $t('header.register') }}</NuxtLink>
+            <NuxtLink :to="localePath('/login')" class="auth-link">{{ $t('header.login') }}</NuxtLink>
+            <NuxtLink :to="localePath('/register')" class="auth-button">{{ $t('header.register') }}</NuxtLink>
           </template>
         </div>
         
@@ -51,20 +51,20 @@
     
     <div class="mobile-menu" :class="{ 'open': mobileMenuOpen }">
       <nav class="nav-mobile">
-        <NuxtLink :to="'/'" class="nav-link" @click="closeMobileMenu">{{ $t('header.home') }}</NuxtLink>
-        <NuxtLink :to="'/bulk-check'" class="nav-link" @click="closeMobileMenu">{{ $t('header.bulkCheck') }}</NuxtLink>
-        <NuxtLink :to="'/tld-list'" class="nav-link" @click="closeMobileMenu">{{ $t('header.tldList') }}</NuxtLink>
-        <NuxtLink to="/tld-extract" class="nav-link" @click="closeMobileMenu">{{ $t('header.tldExtract') }}</NuxtLink>
+        <NuxtLink :to="localePath('/')" class="nav-link" @click="closeMobileMenu">{{ $t('header.home') }}</NuxtLink>
+        <NuxtLink :to="localePath('/bulk-check')" class="nav-link" @click="closeMobileMenu">{{ $t('header.bulkCheck') }}</NuxtLink>
+        <NuxtLink :to="localePath('/tld-list')" class="nav-link" @click="closeMobileMenu">{{ $t('header.tldList') }}</NuxtLink>
+        <NuxtLink :to="localePath('/tld-extract')" class="nav-link" @click="closeMobileMenu">{{ $t('header.tldExtract') }}</NuxtLink>
         
         <template v-if="!isLoggedIn">
-          <NuxtLink to="/login" class="nav-link auth" @click="closeMobileMenu">{{ $t('header.login') }}</NuxtLink>
-          <NuxtLink to="/register" class="nav-link auth" @click="closeMobileMenu">{{ $t('header.register') }}</NuxtLink>
+          <NuxtLink :to="localePath('/login')" class="nav-link auth" @click="closeMobileMenu">{{ $t('header.login') }}</NuxtLink>
+          <NuxtLink :to="localePath('/register')" class="nav-link auth" @click="closeMobileMenu">{{ $t('header.register') }}</NuxtLink>
         </template>
         <template v-else>
-          <NuxtLink to="/profile" class="nav-link" @click="closeMobileMenu">{{ $t('user.profile') }}</NuxtLink>
-          <NuxtLink to="/favorites" class="nav-link" @click="closeMobileMenu">{{ $t('user.favorites') }}</NuxtLink>
-          <NuxtLink to="/history" class="nav-link" @click="closeMobileMenu">{{ $t('user.history') }}</NuxtLink>
-          <NuxtLink to="/settings" class="nav-link" @click="closeMobileMenu">{{ $t('user.settings') }}</NuxtLink>
+          <NuxtLink :to="localePath('/profile')" class="nav-link" @click="closeMobileMenu">{{ $t('user.profile') }}</NuxtLink>
+          <NuxtLink :to="localePath('/favorites')" class="nav-link" @click="closeMobileMenu">{{ $t('user.favorites') }}</NuxtLink>
+          <NuxtLink :to="localePath('/history')" class="nav-link" @click="closeMobileMenu">{{ $t('user.history') }}</NuxtLink>
+          <NuxtLink :to="localePath('/settings')" class="nav-link" @click="closeMobileMenu">{{ $t('user.settings') }}</NuxtLink>
           <button @click="logoutMobile" class="nav-link logout">{{ $t('header.logout') }}</button>
         </template>
       </nav>
@@ -75,9 +75,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useLocalePath } from '#i18n';
 
 // 国际化
 const { locale, locales,setLocale } = useI18n();
+const localePath = useLocalePath();
 const selectedLocale = ref(locale.value);
 const availableLocales = computed(() => locales.value);
 
@@ -99,9 +101,8 @@ const userInitials = computed(() => {
 
 // 切换语言
 const changeLocale = () => {
+  // 只需简单设置locale值，Nuxt i18n会自动处理cookie
   locale.value = selectedLocale.value;
-  setLocale(selectedLocale.value);
-
 };
 
 // 移动菜单
