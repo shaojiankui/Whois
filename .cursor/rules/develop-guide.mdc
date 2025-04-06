@@ -48,11 +48,11 @@ alwaysApply: true
 
     ## 第三步：项目总结和优化
     - 完成任务后，反思完成步骤，思考项目可能存在的问题和改进方式。
-    - 必须更新Note.md文件，包括用户的提示词和你的改动总结，类似开发日志，时间精确到分钟。
+    - 必须更新Note.md文件，包括用户的提示词和你的改动总结，类似开发日志，时间精确到分钟。开发日志只能追加，不要修改之前的任何东西。
     - 考虑使用Vue的高级特性，如Suspense、Teleport等来增强功能。
     - 优化应用性能，包括代码分割、懒加载、虚拟列表等。
     - 实现适当的错误边界处理和性能监控。
 
     在整个过程中，始终参考
-    [Vue.js官方文档](https://vuejs.org/guide/introduction.html)，确保使用最新的Vue.js开发最佳实践。
+    [Vue.js官方文档](mdc:https:/vuejs.org/guide/introduction.html)，确保使用最新的Vue.js开发最佳实践。
     [Nuxt.js官方文档]https://nuxt.zhcndoc.com/docs/getting-started/introduction)，确保使用最新的Nuxt.js开发最佳实践。

@@ -189,6 +189,32 @@ tld-list页面的分页太简陋了，应该支持输入页码跳转和pagesize
 **解决效果**：
 通过正确使用Nuxt i18n提供的localePath函数生成带有语言信息的URL，解决了页面导航时丢失语言设置的问题。此方案比之前的更为优雅，完全依赖Nuxt i18n的内置功能，不需要额外的JavaScript代码或cookie操作。现在用户可以随时切换语言，并在整个应用中保持所选语言，导航到任何页面都不会丢失语言设置。
 
-## 2025-04-07 12:45
+## 2025-04-07 14:15
 
-// ... existing code ...
+### 修改i18n国际化URL策略
+
+**用户提示**：
+```
+我注意到你把/zh/bulk-check 路径增加了zh，我不想加这个zh
+```
+
+**问题分析**：
+使用localePath函数生成URL后，中文路径变成了`/zh/bulk-check`形式，用户不希望URL中包含语言前缀。这是因为Nuxt i18n模块的URL策略默认配置为`prefix_except_default`，导致非默认语言（中文）的URL会添加语言前缀。
+
+**解决方案**：
+修改Nuxt i18n模块的URL策略配置，从`prefix_except_default`改为`no_prefix`，确保所有URL都不包含语言前缀。
+
+**实现内容**：
+在nuxt.config.ts文件中更新i18n模块配置：
+```diff
+- strategy: 'prefix_except_default',
++ strategy: 'no_prefix',
+```
+
+同时保留了其他国际化功能，如：
+- 语言切换
+- cookie持久化
+- 本地化文本
+
+**解决效果**：
+现在应用程序仍然支持中英文切换，但所有URL都保持干净简洁，没有语言前缀。例如，无论用户选择什么语言，"批量查询"页面的URL都是`/bulk-check`而不是`/zh/bulk-check`，符合用户对URL简洁性的要求。
