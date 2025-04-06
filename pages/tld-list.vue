@@ -114,29 +114,81 @@
       </div>
     </div>
     
-    <!-- 分页控件 -->
-    <div v-if="filteredTlds.length > 0" class="pagination">
-      <button 
-        @click="prevPage" 
-        class="pagination-button" 
-        :disabled="currentPage === 1"
-        :class="{ 'disabled': currentPage === 1 }"
-      >
-        &lt;
-      </button>
-      
-      <div class="pagination-info">
-        {{ $t('tldList.page', { current: currentPage, total: totalPages }) }}
+    <!-- 增强版分页控件 -->
+    <div v-if="filteredTlds.length > 0" class="pagination-container">
+      <div class="page-size-selector">
+        <span class="page-size-label">{{ $t('tldList.pageSize') }}:</span>
+        <select v-model="pageSize" class="page-size-select" @change="handlePageSizeChange">
+          <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
+        </select>
       </div>
       
-      <button 
-        @click="nextPage" 
-        class="pagination-button" 
-        :disabled="currentPage === totalPages"
-        :class="{ 'disabled': currentPage === totalPages }"
-      >
-        &gt;
-      </button>
+      <div class="pagination">
+        <button 
+          @click="goToFirstPage" 
+          class="pagination-button" 
+          :disabled="currentPage === 1"
+          :class="{ 'disabled': currentPage === 1 }"
+          title="First Page"
+        >
+          &laquo;
+        </button>
+        
+        <button 
+          @click="prevPage" 
+          class="pagination-button" 
+          :disabled="currentPage === 1"
+          :class="{ 'disabled': currentPage === 1 }"
+          title="Previous Page"
+        >
+          &lt;
+        </button>
+        
+        <div class="page-numbers">
+          <button 
+            v-for="pageNum in displayedPageNumbers" 
+            :key="pageNum" 
+            @click="goToPage(pageNum)"
+            class="page-number-button"
+            :class="{ 'active': currentPage === pageNum }"
+          >
+            {{ pageNum }}
+          </button>
+        </div>
+        
+        <button 
+          @click="nextPage" 
+          class="pagination-button" 
+          :disabled="currentPage === totalPages"
+          :class="{ 'disabled': currentPage === totalPages }"
+          title="Next Page"
+        >
+          &gt;
+        </button>
+        
+        <button 
+          @click="goToLastPage" 
+          class="pagination-button" 
+          :disabled="currentPage === totalPages"
+          :class="{ 'disabled': currentPage === totalPages }"
+          title="Last Page"
+        >
+          &raquo;
+        </button>
+      </div>
+      
+      <div class="page-jumper">
+        <span class="page-jumper-label">{{ $t('tldList.goTo') }}:</span>
+        <input 
+          type="number" 
+          v-model="pageInputValue" 
+          class="page-input" 
+          :min="1" 
+          :max="totalPages"
+          @keyup.enter="jumpToPage"
+        />
+        <button @click="jumpToPage" class="jump-button">{{ $t('tldList.go') }}</button>
+      </div>
     </div>
     
     <!-- TLD详情模态框 -->
@@ -266,8 +318,43 @@ const selectedLevel = ref('1');
 
 // 分页相关
 const currentPage = ref(1);
-const pageSize = ref(12);
+const pageSize = ref(50);
+const pageInputValue = ref('');
+const pageSizeOptions = [50, 100, 500];
 const totalPages = computed(() => Math.ceil(filteredTlds.value.length / pageSize.value));
+
+// 计算要显示的页码数字
+const displayedPageNumbers = computed(() => {
+  const totalPageCount = totalPages.value;
+  const currentPageNum = currentPage.value;
+  let startPage = 1;
+  let endPage = totalPageCount;
+  const maxDisplayedPages = 5; // 最多显示5个页码
+  
+  if (totalPageCount > maxDisplayedPages) {
+    // 当前页在开头
+    if (currentPageNum <= Math.ceil(maxDisplayedPages / 2)) {
+      endPage = maxDisplayedPages;
+    }
+    // 当前页在末尾
+    else if (currentPageNum > totalPageCount - Math.floor(maxDisplayedPages / 2)) {
+      startPage = totalPageCount - maxDisplayedPages + 1;
+    }
+    // 当前页在中间
+    else {
+      startPage = currentPageNum - Math.floor(maxDisplayedPages / 2);
+      endPage = currentPageNum + Math.floor(maxDisplayedPages / 2);
+    }
+  }
+  
+  // 生成页码数组
+  const pages = [];
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+  
+  return pages;
+});
 
 // 模态框状态
 const showModal = ref(false);
@@ -462,6 +549,47 @@ const currentPageTlds = computed(() => {
   return filteredTlds.value.slice(startIndex, startIndex + pageSize.value);
 });
 
+// 更改每页显示数量
+const handlePageSizeChange = () => {
+  currentPage.value = 1; // 重置到第一页
+  scrollToTop();
+};
+
+// 跳转到特定页
+const goToPage = (page: number) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+    scrollToTop();
+  }
+};
+
+// 转到第一页
+const goToFirstPage = () => {
+  if (currentPage.value !== 1) {
+    currentPage.value = 1;
+    scrollToTop();
+  }
+};
+
+// 转到最后一页
+const goToLastPage = () => {
+  if (currentPage.value !== totalPages.value) {
+    currentPage.value = totalPages.value;
+    scrollToTop();
+  }
+};
+
+// 通过输入框跳转
+const jumpToPage = () => {
+  const pageNum = parseInt(pageInputValue.value);
+  if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages.value) {
+    currentPage.value = pageNum;
+    scrollToTop();
+  }
+  // 清空输入框
+  pageInputValue.value = '';
+};
+
 // 转到下一页
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
@@ -490,6 +618,11 @@ watch(searchQuery, () => {
 
 // 切换分类时重置页码
 watch(selectedCategory, () => {
+  currentPage.value = 1;
+});
+
+// 切换类型时重置页码
+watch(selectedType, () => {
   currentPage.value = 1;
 });
 
@@ -679,56 +812,93 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  padding: 1.5rem;
+  padding: 1rem;
   
   &:hover {
     transform: translateY(-5px);
   }
   
   .tld-name {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
     color: var(--primary-color);
   }
   
   .tld-type {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     display: inline-block;
     background-color: rgba(17, 252, 212, 0.1);
     color: var(--card-text-color);
-    padding: 0.2rem 0.6rem;
+    padding: 0.2rem 0.5rem;
     border-radius: 4px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.7rem;
   }
   
   .tld-info {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.7rem;
     flex-grow: 1;
     
     .info-item {
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.85rem;
       
       .info-label {
         font-weight: 600;
-        margin-right: 0.5rem;
+        margin-right: 0.3rem;
       }
     }
   }
 }
 
-/* 分页样式 */
+/* 增强版分页样式 */
+.pagination-container {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  .page-size-label {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  
+  .page-size-select {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--card-bg);
+    color: var(--card-text-color);
+    cursor: pointer;
+    
+    &:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+  }
+}
+
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 2rem;
-  gap: 1rem;
+  gap: 0.5rem;
   
   .pagination-button {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -736,7 +906,7 @@ onMounted(() => {
     color: var(--card-text-color);
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    font-size: 1.2rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s;
     
@@ -750,8 +920,84 @@ onMounted(() => {
     }
   }
   
-  .pagination-info {
+  .page-numbers {
+    display: flex;
+    gap: 0.25rem;
+    
+    .page-number-button {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--card-bg);
+      color: var(--card-text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      
+      &:hover {
+        background-color: var(--border-color);
+      }
+      
+      &.active {
+        background-color: var(--primary-color);
+        color: #111111;
+        border-color: var(--primary-color);
+      }
+    }
+  }
+}
+
+.page-jumper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  .page-jumper-label {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  
+  .page-input {
+    width: 60px;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    text-align: center;
+    
+    &:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+    
+    /* 移除数字输入框的上下箭头 */
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    
+    /* Firefox */
+    -moz-appearance: textfield;
+  }
+  
+  .jump-button {
+    padding: 0.4rem 0.8rem;
+    background-color: var(--primary-color);
+    color: #111111;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
     font-size: 0.9rem;
+    
+    &:hover {
+      background-color: var(--hover-color);
+    }
   }
 }
 
