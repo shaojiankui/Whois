@@ -1,5 +1,5 @@
 // 使用新的@use规则代替弃用的@import
-@import './variables';
+@use './variables' as *;
 :root {
   --primary-color: #{$primary-color};
   --secondary-color: #{$secondary-color};

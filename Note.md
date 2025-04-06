@@ -218,3 +218,53 @@ tld-list页面的分页太简陋了，应该支持输入页码跳转和pagesize
 
 **解决效果**：
 现在应用程序仍然支持中英文切换，但所有URL都保持干净简洁，没有语言前缀。例如，无论用户选择什么语言，"批量查询"页面的URL都是`/bulk-check`而不是`/zh/bulk-check`，符合用户对URL简洁性的要求。
+
+## 2025-04-07 15:10
+
+### 修复Sass @import弃用警告
+
+**用户提示**：
+```
+这个sass警告就不能解决么？仔细研究下
+```
+
+**问题分析**：
+项目中存在Sass `@import` 语法弃用警告，显示信息为"Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0"。在组件加载时显示此警告，影响开发体验。问题出现在两个地方：
+1. `assets/scss/main.scss`文件中使用了`@import './variables'`导入变量
+2. `nuxt.config.ts`文件中的vite配置使用了`@import "@/assets/scss/variables.scss"`全局导入变量
+
+**解决方案**：
+根据Sass官方建议，使用现代的`@use`模块系统替代旧的`@import`语法，这符合Sass的最新最佳实践。
+
+**实现内容**：
+1. 修改`assets/scss/main.scss`文件：
+```diff
+// 使用新的@use规则代替弃用的@import
+- @import './variables';
++ @use './variables' as *;
+```
+
+2. 修改`nuxt.config.ts`中的Vite预处理配置：
+```diff
+vite: {
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+-         @import "@/assets/scss/variables.scss";
++         @use "@/assets/scss/variables.scss" as *;
+        `
+      }
+    }
+  }
+}
+```
+
+`as *`语法表示将模块中的所有变量、函数和混合器导入到当前命名空间，使其可以直接使用，类似于旧的`@import`行为。
+
+**解决效果**：
+1. 消除了编译时的Sass弃用警告
+2. 代码更符合Sass 3.0的未来标准
+3. 提高了构建过程的整洁度
+4. 改进了样式模块化管理，有利于更好的组织和维护SCSS代码
+5. 保持了原有功能，所有变量和混合器仍能正常使用
