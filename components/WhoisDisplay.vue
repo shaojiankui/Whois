@@ -355,7 +355,11 @@ checkFavoriteStatus();
 
     .whois-content {
         padding: 1rem;
-
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        margin-top: 2rem;
+        border: 1px solid var(--border-color);
         .info-row {
             display: flex;
             padding: 0.6rem 0;

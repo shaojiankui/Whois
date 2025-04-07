@@ -12,11 +12,13 @@
   },
   "dependencies": {
     "dayjs": "^1.11.13",
+    "jsonwebtoken": "^9.0.2",
     "lodash-es": "^4.17.21",
     "mysql2": "^3.14.0",
     "redis": "^4.7.0"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
     "@nuxt/devtools": "latest",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "@nuxtjs/i18n": "^9.4.0",

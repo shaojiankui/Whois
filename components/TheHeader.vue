@@ -25,16 +25,36 @@
         
         <div class="auth-actions">
           <template v-if="isLoggedIn">
-            <div class="user-menu" @click="toggleUserMenu" ref="userMenuTrigger">
-              <div class="avatar">{{ userInitials }}</div>
-              <span v-if="!isMobile">{{ userName }}</span>
-              <div class="user-dropdown" v-if="showUserMenu">
-                <NuxtLink :to="localePath('/profile')" class="dropdown-item">{{ $t('user.profile') }}</NuxtLink>
-                <NuxtLink :to="localePath('/favorites')" class="dropdown-item">{{ $t('user.favorites') }}</NuxtLink>
-                <NuxtLink :to="localePath('/history')" class="dropdown-item">{{ $t('user.history') }}</NuxtLink>
-                <NuxtLink :to="localePath('/settings')" class="dropdown-item">{{ $t('user.settings') }}</NuxtLink>
-                <button @click="logout" class="dropdown-item logout">{{ $t('header.logout') }}</button>
+            <div class="user-menu">
+              <div @click="toggleUserMenu" ref="userMenuTrigger" class="user-avatar-wrapper">
+                <span class="sr-only">Open user menu</span>
+                <div ref="avatarRef" class="user-avatar">
+                  {{ initialLetter }}
+                </div>
               </div>
+
+              <transition 
+                name="dropdown"
+                enter-active-class="dropdown-enter-active"
+                leave-active-class="dropdown-leave-active"
+              >
+                <div v-show="showUserMenu" class="user-dropdown">
+                  <NuxtLink :to="localePath('/profile')" class="dropdown-item">
+                    {{ $t("header.profile") }}
+                  </NuxtLink>
+                  <NuxtLink :to="localePath('/settings')" class="dropdown-item">
+                    {{ $t("header.settings") }}
+                  </NuxtLink>
+                  <div class="dropdown-divider"></div>
+                  <NuxtLink :to="localePath('/ui-guide')" class="dropdown-item">
+                    {{ $t("ui.designSystem") }}
+                  </NuxtLink>
+                  <div class="dropdown-divider"></div>
+                  <button @click="handleLogout" class="dropdown-item logout">
+                    {{ $t("header.logout") }}
+                  </button>
+                </div>
+              </transition>
             </div>
           </template>
           <template v-else>
@@ -76,12 +96,14 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useLocalePath } from '#i18n';
+import { useRouter } from 'vue-router';
 
 // 国际化
 const { locale, locales,setLocale } = useI18n();
 const localePath = useLocalePath();
 const selectedLocale = ref(locale.value);
 const availableLocales = computed(() => locales.value);
+const router = useRouter();
 
 // 移动导航
 const mobileMenuOpen = ref(false);
@@ -91,13 +113,50 @@ const isMobile = ref(false);
 const showUserMenu = ref(false);
 const userMenuTrigger = ref(null);
 
-// 模拟用户登录状态（后期与API连接）
+// 用户登录状态
 const isLoggedIn = ref(false);
 const userName = ref('');
 const userInitials = computed(() => {
   if (!userName.value) return '';
   return userName.value.split(' ').map(n => n[0]).join('').toUpperCase();
 });
+
+// 用户相关变量
+const avatarRef = ref(null);
+const initialLetter = computed(() => {
+  if (!userName.value) return 'U';
+  return userName.value.charAt(0).toUpperCase();
+});
+
+// 获取当前用户信息
+const fetchUserInfo = async () => {
+  try {
+    const response = await fetch('/api/user/me', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include'
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log('User info response:', result); // 添加调试信息
+      if (result.code === 200 && result.data) {
+        isLoggedIn.value = true;
+        userName.value = result.data.name || result.data.username || 'User';
+        console.log('User name set to:', userName.value); // 添加调试信息
+      } else {
+        isLoggedIn.value = false;
+      }
+    } else {
+      isLoggedIn.value = false;
+    }
+  } catch (error) {
+    console.error('Failed to fetch user info:', error);
+    isLoggedIn.value = false;
+  }
+};
 
 // 切换语言
 const changeLocale = () => {
@@ -116,20 +175,38 @@ const closeMobileMenu = () => {
   document.body.style.overflow = '';
 };
 
-// 用户菜单
+// 切换用户菜单
 const toggleUserMenu = () => {
   showUserMenu.value = !showUserMenu.value;
 };
 
-// 注销
-const logout = () => {
-  // TODO: 实现注销逻辑，连接API
-  isLoggedIn.value = false;
-  showUserMenu.value = false;
+// 注销处理函数
+const handleLogout = async () => {
+  try {
+    const response = await fetch('/api/user/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include'
+    });
+    
+    if (response.ok) {
+      isLoggedIn.value = false;
+      showUserMenu.value = false;
+      router.push(localePath('/'));
+      
+      // 刷新页面以更新导航栏状态
+      window.location.reload();
+    }
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
 };
 
+// 保持现有的mobile logout函数
 const logoutMobile = () => {
-  logout();
+  handleLogout();
   closeMobileMenu();
 };
 
@@ -150,8 +227,8 @@ onMounted(() => {
   // 初始化语言选择器的值
   selectedLocale.value = locale.value;
   
-  // 初始化用户状态（实际中从API获取）
-  // TODO: 从API获取用户信息
+  // 获取用户信息
+  fetchUserInfo();
   
   // 添加事件监听
   if (process.client) {
@@ -171,6 +248,11 @@ onUnmounted(() => {
 // 监听全局语言变化，更新选择器
 watch(() => locale.value, (newLocale) => {
   selectedLocale.value = newLocale;
+});
+
+// 监听路由变化时检查用户状态
+watch(() => router.currentRoute.value.path, () => {
+  fetchUserInfo();
 });
 </script>
 
@@ -308,30 +390,35 @@ watch(() => locale.value, (newLocale) => {
     }
     
     .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
       position: relative;
       
-      .avatar {
-        width: 32px;
-        height: 32px;
+      .user-avatar-wrapper {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+      }
+      
+      .user-avatar {
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
         background-color: var(--primary-color);
-        color: #000;
+        color: var(--bg-color);
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 600;
+        font-size: 1.1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        text-transform: uppercase;
       }
       
       .user-dropdown {
         position: absolute;
-        top: 40px;
+        top: 45px;
         right: 0;
         background-color: var(--card-bg);
-        border-radius: 4px;
+        border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         width: 180px;
         z-index: 10;
@@ -349,21 +436,26 @@ watch(() => locale.value, (newLocale) => {
             background-color: rgba(17, 252, 212, 0.1);
             color: var(--primary-color);
           }
+        }
+        
+        .dropdown-divider {
+          height: 1px;
+          background-color: var(--border-color);
+          margin: 0.25rem 0;
+        }
+        
+        .logout {
+          width: 100%;
+          text-align: left;
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 1rem;
+          font-family: inherit;
+          color: var(--error-color);
           
-          &.logout {
-            border-top: 1px solid var(--border-color);
-            color: var(--error-color);
-            width: 100%;
-            text-align: left;
-            background: none;
-            border-left: none;
-            border-right: none;
-            border-bottom: none;
-            cursor: pointer;
-            
-            &:hover {
-              background-color: rgba(239, 68, 68, 0.1);
-            }
+          &:hover {
+            background-color: rgba(239, 68, 68, 0.1);
           }
         }
       }
@@ -470,5 +562,33 @@ watch(() => locale.value, (newLocale) => {
       }
     }
   }
+}
+
+// 下拉菜单动画
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.dropdown-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.dropdown-leave-active {
+  transform: translateY(-10px);
+  opacity: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 </style> 

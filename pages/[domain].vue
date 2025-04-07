@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, onBeforeMount } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeMount, watchEffect } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n';
@@ -73,6 +73,10 @@ const showRawData = ref(false);
 
 // 收藏状态
 const isFavorited = ref(false);
+
+// 检查用户是否已登录
+const isAuthenticated = ref(false);
+const userId = ref(null);
 
 // 域名状态计算
 const statusClass = computed(() => {
@@ -163,6 +167,60 @@ const whoisDisplayData = computed<WhoisDisplayData>(() => {
     };
 });
 
+// 检查用户身份
+async function checkUserAuth() {
+    try {
+        const response = await fetch('/api/user/me', {
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            isAuthenticated.value = true;
+            userId.value = data.user.id;
+            return true;
+        } else {
+            isAuthenticated.value = false;
+            return false;
+        }
+    } catch (error) {
+        console.error('Error checking authentication:', error);
+        isAuthenticated.value = false;
+        return false;
+    }
+}
+
+// 保存查询历史
+async function saveSearchHistory(domain: string) {
+    if (!isAuthenticated.value || !userId.value) return;
+    
+    try {
+        await fetch('/api/user/history', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                domain,
+                tag: 'whois', // 可以根据查询类型设置不同的tag
+                uuid: generateUuid() // 生成一个随机UUID
+            })
+        });
+    } catch (error) {
+        console.error('Error saving search history:', error);
+    }
+}
+
+// 生成UUID
+function generateUuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 // 当组件挂载时加载域名信息
 onMounted(async () => {
     if (!domain.value) return;
@@ -182,6 +240,10 @@ onMounted(async () => {
         
         // 检查是否已收藏
         isFavorited.value = checkFavoriteStatus();
+        
+        // 检查用户身份
+        await checkUserAuth();
+        saveSearchHistory(domain.value);
         
     } catch (err) {
         console.error('Failed to fetch WHOIS data:', err);
@@ -218,6 +280,10 @@ const loadDomainInfo = async () => {
         
         // 检查是否已收藏
         isFavorited.value = checkFavoriteStatus();
+        
+        // 检查用户身份
+        await checkUserAuth();
+        saveSearchHistory(domain.value);
     } catch (err) {
         console.error('Failed to fetch WHOIS data:', err);
         error.value = err.message || 'Failed to fetch WHOIS data';
@@ -303,6 +369,14 @@ const toggleRawData = () => {
 
 onBeforeMount(() => {
     domain.value = route.params.domain as string;
+});
+
+// 在查询域名时调用保存历史
+watchEffect(async () => {
+    if (domain.value) {
+        await checkUserAuth();
+        saveSearchHistory(domain.value);
+    }
 });
 </script>
 
