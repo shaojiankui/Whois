@@ -28,6 +28,7 @@ export async function initRedisClient(): Promise<boolean> {
         host: cacheConfig.redis.host,
         port: cacheConfig.redis.port,
       },
+      username: cacheConfig.redis.username,
       password: cacheConfig.redis.password,
       database: cacheConfig.redis.db,
     });

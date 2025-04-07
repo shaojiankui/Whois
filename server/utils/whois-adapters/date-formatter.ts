@@ -4,9 +4,9 @@
  */
 
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import { loadJsonConfig } from './config-loader';
 import { getTldTimezone as fetchTldTimezone } from '../tld';
 
