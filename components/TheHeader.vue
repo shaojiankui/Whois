@@ -39,20 +39,25 @@
                 leave-active-class="dropdown-leave-active"
               >
                 <div v-show="showUserMenu" class="user-dropdown">
-                  <NuxtLink :to="localePath('/profile')" class="dropdown-item">
-                    {{ $t("header.profile") }}
-                  </NuxtLink>
-                  <NuxtLink :to="localePath('/settings')" class="dropdown-item">
-                    {{ $t("header.settings") }}
-                  </NuxtLink>
-                  <div class="dropdown-divider"></div>
-                  <NuxtLink :to="localePath('/ui-guide')" class="dropdown-item">
-                    {{ $t("ui.designSystem") }}
-                  </NuxtLink>
-                  <div class="dropdown-divider"></div>
-                  <button @click="handleLogout" class="dropdown-item logout">
-                    {{ $t("header.logout") }}
-                  </button>
+                  <div class="user-menu-items">
+                    <NuxtLink :to="localePath('/profile')" class="user-menu-item">
+                      {{ $t('user.profile') }}
+                    </NuxtLink>
+                    <NuxtLink :to="localePath('/settings')" class="user-menu-item">
+                      {{ $t('user.settings') }}
+                    </NuxtLink>
+                    <NuxtLink :to="localePath('/history')" class="user-menu-item">
+                      {{ $t('user.history') }}
+                    </NuxtLink>
+                    <hr class="menu-divider" />
+                    <NuxtLink :to="localePath('/ui-guide')" class="user-menu-item">
+                      {{ $t('ui.designSystem') }}
+                    </NuxtLink>
+                    <hr class="menu-divider" />
+                    <a href="#" class="user-menu-item logout" @click.prevent="handleLogout">
+                      {{ $t('header.logout') }}
+                    </a>
+                  </div>
                 </div>
               </transition>
             </div>
@@ -415,47 +420,45 @@ watch(() => router.currentRoute.value.path, () => {
       
       .user-dropdown {
         position: absolute;
-        top: 45px;
+        top: 100%;
         right: 0;
+        min-width: 200px;
         background-color: var(--card-bg);
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        width: 180px;
-        z-index: 10;
-        overflow: hidden;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        z-index: 50;
+        margin-top: 0.5rem;
         border: 1px solid var(--border-color);
         
-        .dropdown-item {
-          display: block;
-          padding: 0.75rem 1rem;
-          color: var(--text-color);
-          text-decoration: none;
-          transition: background-color 0.2s;
+        .user-menu-items {
+          padding: 0.5rem;
           
-          &:hover {
-            background-color: rgba(17, 252, 212, 0.1);
-            color: var(--primary-color);
+          .user-menu-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+            
+            &:hover {
+              background-color: rgba(0, 0, 0, 0.05);
+            }
+            
+            &.logout {
+              color: var(--error-color);
+              
+              &:hover {
+                background-color: rgba(239, 68, 68, 0.1);
+              }
+            }
           }
-        }
-        
-        .dropdown-divider {
-          height: 1px;
-          background-color: var(--border-color);
-          margin: 0.25rem 0;
-        }
-        
-        .logout {
-          width: 100%;
-          text-align: left;
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-size: 1rem;
-          font-family: inherit;
-          color: var(--error-color);
           
-          &:hover {
-            background-color: rgba(239, 68, 68, 0.1);
+          .menu-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            border: none;
+            margin: 0.5rem 0;
           }
         }
       }

@@ -23,11 +23,20 @@ export const getMysqlConnection = async (): Promise<Connection> => {
  */
 export const query = async <T = RowDataPacket[]>(sql: string, params: any[] = []): Promise<T> => {
   try {
+    console.log(`[MySQL] Executing query: ${sql}`);
+    console.log(`[MySQL] Query parameters:`, params);
+    console.log(`[MySQL] Parameter types:`, params.map(p => `${typeof p}: ${p === null ? 'null' : p}`));
+    
     const conn = await getMysqlConnection();
     const [rows] = await conn.execute(sql, params);
+    
+    console.log(`[MySQL] Query returned ${Array.isArray(rows) ? rows.length : 1} row(s)`);
     return rows as T;
-  } catch (error) {
-    console.error('MySQL Query Error:', error);
+  } catch (error: any) {
+    console.error('[MySQL] Query Error:', error);
+    console.error(`[MySQL] SQL: ${sql}`);
+    console.error(`[MySQL] Parameters:`, params);
+    console.error(`[MySQL] Parameter types:`, params.map(p => `${typeof p}: ${p === null ? 'null' : p}`));
     throw error;
   }
 };
@@ -46,11 +55,16 @@ export const insert = async (table: string, data: Record<string, any>): Promise<
   const sql = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders})`;
   
   try {
+    console.log(`[MySQL] Executing INSERT to ${table}:`, { keys, values });
     const conn = await getMysqlConnection();
     const [result] = await conn.execute(sql, values);
+    console.log(`[MySQL] Insert successful, result:`, result);
     return result as OkPacket;
-  } catch (error) {
-    console.error('MySQL Insert Error:', error);
+  } catch (error: any) {
+    console.error(`[MySQL] Insert Error on table ${table}:`, error);
+    console.error(`[MySQL] SQL: ${sql}`);
+    console.error(`[MySQL] Parameters:`, values);
+    console.error(`[MySQL] Parameter types:`, values.map(v => `${typeof v}: ${v === null ? 'null' : v}`));
     throw error;
   }
 };

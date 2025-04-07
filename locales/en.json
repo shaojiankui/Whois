@@ -32,7 +32,15 @@
     "info": "Info",
     "noResults": "No results",
     "close": "Close",
-    "expand": "Expand"
+    "expand": "Expand",
+    "noRecords": "No records found",
+    "domain": "Domain",
+    "tag": "Tag",
+    "searchTime": "Search Time",
+    "actions": "Actions",
+    "view": "View",
+    "page": "Page",
+    "all": "All"
   },
   "header": {
     "title": "Whois Lookup System",

@@ -176,20 +176,35 @@ export const setUserPreference = async (
  * Save query history
  */
 export const saveQueryHistory = async (queryHistory: QueryHistory): Promise<number> => {
-  const result = await insert('query_history', {
-    user_id: queryHistory.user_id,
-    domain: queryHistory.domain,
-    tag: queryHistory.tag || null,
-    premium: queryHistory.premium || 0,
-    reg_price: queryHistory.reg_price || null,
-    renew_price: queryHistory.renew_price || null,
-    flag: queryHistory.flag || null,
-    add_time: new Date(),
-    update_time: new Date(),
-    uuid: queryHistory.uuid || null
-  });
-  
-  return result.insertId;
+  // Create a new object with explicitly converted types to match the database schema
+  // This prevents type mismatch errors in MySQL prepared statements
+  try {
+    console.log('Saving query history with data:', queryHistory);
+    
+    // Ensure all fields have proper types to prevent MySQL errors
+    const insertData = {
+      user_id: Number(queryHistory.user_id),
+      domain: String(queryHistory.domain),
+      tag: queryHistory.tag ? String(queryHistory.tag) : null,
+      premium: queryHistory.premium !== undefined ? Number(queryHistory.premium) : 0,
+      reg_price: queryHistory.reg_price !== undefined ? Number(queryHistory.reg_price) : null,
+      renew_price: queryHistory.renew_price !== undefined ? Number(queryHistory.renew_price) : null,
+      flag: queryHistory.flag !== undefined ? Number(queryHistory.flag) : 0,
+      add_time: new Date(),
+      update_time: new Date(),
+      uuid: queryHistory.uuid ? String(queryHistory.uuid) : null
+    };
+    
+    console.log('Converted insert data:', insertData);
+    
+    const result = await insert('query_history', insertData);
+    
+    console.log('Query history saved with ID:', result.insertId);
+    return result.insertId;
+  } catch (error) {
+    console.error('Error saving query history:', error);
+    throw error;
+  }
 };
 
 /**
@@ -200,24 +215,44 @@ export const getUserQueryHistory = async (
   limit: number = 20, 
   offset: number = 0
 ): Promise<QueryHistory[]> => {
-  const result = await query<(QueryHistory & RowDataPacket)[]>(
-    'SELECT * FROM query_history WHERE user_id = ? ORDER BY add_time DESC LIMIT ? OFFSET ?',
-    [userId, limit, offset]
-  );
-  
-  return result.map(row => ({
-    id: row.id,
-    user_id: row.user_id,
-    domain: row.domain,
-    tag: row.tag,
-    premium: row.premium,
-    reg_price: row.reg_price,
-    renew_price: row.renew_price,
-    flag: row.flag,
-    add_time: row.add_time,
-    update_time: row.update_time,
-    uuid: row.uuid
-  }));
+  try {
+    console.log('Getting query history with params:', { userId, limit, offset });
+    
+    // Convert parameters to ensure correct types
+    const userIdNum = Number(userId);
+    const limitNum = Number(limit);
+    const offsetNum = Number(offset);
+    
+    // Use a direct query with hardcoded limit and offset to avoid prepared statement issues
+    const sql = `SELECT * FROM query_history WHERE user_id = ? ORDER BY add_time DESC LIMIT ${limitNum} OFFSET ${offsetNum}`;
+    
+    console.log('Using SQL query:', sql);
+    console.log('With parameters:', [userIdNum]);
+    
+    const result = await query<(QueryHistory & RowDataPacket)[]>(
+      sql,
+      [userIdNum]
+    );
+    
+    console.log(`Retrieved ${result.length} history records`);
+    
+    return result.map(row => ({
+      id: row.id,
+      user_id: row.user_id,
+      domain: row.domain,
+      tag: row.tag,
+      premium: row.premium,
+      reg_price: row.reg_price,
+      renew_price: row.renew_price,
+      flag: row.flag,
+      add_time: row.add_time,
+      update_time: row.update_time,
+      uuid: row.uuid
+    }));
+  } catch (error) {
+    console.error('Error retrieving user query history:', error);
+    throw error;
+  }
 };
 
 /**

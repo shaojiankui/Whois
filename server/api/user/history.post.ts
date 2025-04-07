@@ -6,53 +6,78 @@ import { ResponseData } from '~/server/utils/response';
 
 export default createApiHandler(async (event) => {
   try {
+    console.log('Processing history.post request');
+    console.log('Headers:', event.node.req.headers);
+    
     // Get user ID from auth token
     const userId = getUserFromEvent(event);
+    console.log('User ID from auth token:', userId);
+    
     if (!userId) {
-      throw createError({
-        statusCode: 401,
-        message: 'Unauthorized'
-      });
+      console.log('Authorization failed: No valid user ID found in token');
+      return ResponseData.error('Unauthorized: Please log in to save history', 401);
     }
     
     // Read request body
-    const { domain, tag, premium, reg_price, renew_price, flag, uuid } = await readBody(event);
+    const body = await readBody(event);
+    console.log('Request body:', body);
+    
+    // Extract and validate parameters
+    const domain = body.domain ? String(body.domain).trim() : null;
+    const tag = body.tag ? String(body.tag).trim() : 'whois';
+    const premium = body.premium !== undefined ? Number(body.premium) : 0;
+    // Convert reg_price and renew_price to numbers if present
+    const reg_price = body.reg_price !== undefined && body.reg_price !== null ? Number(body.reg_price) : undefined;
+    const renew_price = body.renew_price !== undefined && body.renew_price !== null ? Number(body.renew_price) : undefined;
+    const flag = body.flag !== undefined ? Number(body.flag) : 0;
+    const uuid = body.uuid ? String(body.uuid) : undefined;
     
     // Validate input
     if (!domain) {
-      throw createError({
-        statusCode: 400,
-        message: 'Domain is required'
-      });
+      console.log('Validation failed: Domain is required');
+      return ResponseData.error('Domain is required', 400);
     }
     
-    // Save query history
-    const historyId = await saveQueryHistory({
+    // Log parameters after validation
+    console.log('Validated parameters:', {
       user_id: userId,
       domain,
-      tag: tag || 'whois',
-      premium: premium || 0,
-      reg_price: reg_price || null,
-      renew_price: renew_price || null,
-      flag: flag || 0,
-      uuid: uuid || null
+      tag,
+      premium,
+      reg_price,
+      renew_price,
+      flag,
+      uuid
     });
     
-    return ResponseData.success({
-      historyId
-    }, 'Query history saved successfully');
-  } catch (error: any) {
-    if (error.statusCode) {
-      throw createError({
-        statusCode: error.statusCode,
-        message: error.message
+    try {
+      // Save query history
+      const historyId = await saveQueryHistory({
+        user_id: userId,
+        domain,
+        tag,
+        premium,
+        reg_price,
+        renew_price,
+        flag,
+        uuid
       });
+      
+      console.log('History saved successfully with ID:', historyId);
+      return ResponseData.success({
+        historyId
+      }, 'Query history saved successfully');
+    } catch (dbError: any) {
+      console.error('Database error in saveQueryHistory:', dbError);
+      return ResponseData.error(`Database error: ${dbError.message}`, 500);
+    }
+  } catch (error: any) {
+    console.error('Save query history error:', error);
+    
+    if (error.statusCode) {
+      return ResponseData.error(error.message, error.statusCode);
     }
     
-    console.error('Save query history error:', error);
-    throw createError({
-      statusCode: 500,
-      message: 'Failed to save query history'
-    });
+    return ResponseData.error(`Failed to save query history: ${error.message || 'Unknown error'}`, 500);
   }
 }); 

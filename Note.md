@@ -333,3 +333,59 @@ vite: {
 - 类型分类（热门后缀、科技域名、限制域名）
 
 标签采用颜色编码系统，使用户可以快速识别不同类型的信息，大大提升了WHOIS查询结果的可读性和实用性，帮助用户更高效地理解域名信息。
+
+## 2025-04-07 17:32
+
+### 修复API错误: Database error: Incorrect arguments to mysqld_stmt_execute
+
+**用户提示**：
+```
+ERROR  API错误: Database error: Incorrect arguments to mysqld_stmt_execute
+```
+
+**问题分析**：
+在访问`/api/user/history`接口时出现了MySQL数据库错误，具体报错信息为"Incorrect arguments to mysqld_stmt_execute"。经过调查，发现这是MySQL预处理语句的参数类型不匹配导致的问题，特别是在处理LIMIT和OFFSET等分页参数时。此问题同时影响了历史记录的保存(POST)和获取(GET)操作。
+
+**解决方案**：
+1. **针对POST请求(保存历史)**：
+   - 增强`saveQueryHistory`函数中的参数类型转换
+   - 确保所有参数都被显式转换为正确的数据类型
+   - 改进null值处理逻辑
+
+2. **针对GET请求(获取历史)**：
+   - 修改SQL查询方式，避免将LIMIT和OFFSET作为预处理参数
+   - 直接将数值嵌入SQL查询字符串中
+   - 增加详细的日志记录，帮助调试类型转换问题
+
+3. **改进错误处理**：
+   - 使用`ResponseData.error`统一错误响应格式
+   - 提供更详细的错误信息，便于诊断
+   - 精确区分授权错误和数据库错误
+
+**实现内容**：
+1. 更新`server/repositories/userRepository.ts`：
+   - 增强`saveQueryHistory`函数的参数类型转换
+   - 修改`getUserQueryHistory`函数，避免LIMIT/OFFSET参数类型问题
+   - 添加详细的日志记录，帮助排查问题
+
+2. 更新`server/database/mysql.ts`：
+   - 为`query`和`insert`函数添加增强的错误日志
+   - 记录参数类型信息，协助调试类型不匹配问题
+
+3. 更新`server/api/user/history.post.ts`和`server/api/user/history.get.ts`：
+   - 改进分页参数处理和验证
+   - 使用`ResponseData.error`替代`createError`，提供一致的错误处理
+   - 增加更多的调试日志
+
+**测试与验证**：
+1. 使用curl测试了带授权token的POST请求，成功保存了域名查询历史
+2. 测试了GET请求，成功获取了带分页的查询历史列表
+3. 验证了异常情况处理，包括无效token和异常参数值
+
+**改进效果**：
+1. 修复了"Incorrect arguments to mysqld_stmt_execute"数据库错误
+2. 增强了MySQL操作的错误处理和日志记录
+3. 提升了API响应的一致性和用户友好性
+4. 改进了代码的健壮性，能更好地处理各种边缘情况
+
+解决方案体现了对MySQL预处理语句特性的深入理解，并通过合适的参数处理和SQL查询构建方式，避免了类型不匹配问题。这一修复确保了用户查询历史功能的稳定性和可靠性。
