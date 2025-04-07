@@ -11,7 +11,7 @@ function simpleMarkdownToHtml(markdown: string): string {
     .replace(/\n{3,}/g, '\n\n');
   
   // 将markdown转换为HTML
-  return cleanedMarkdown
+  let html = cleanedMarkdown
     // 将h1标题转换为HTML
     .replace(/^# (.*)$/gm, '<h1>$1</h1>')
     // 将h2标题转换为HTML
@@ -19,9 +19,17 @@ function simpleMarkdownToHtml(markdown: string): string {
     // 将h3标题转换为HTML
     .replace(/^### (.*)$/gm, '<h3>$1</h3>')
     // 将h4标题转换为HTML
-    .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
+    .replace(/^#### (.*)$/gm, '<h4>$1</h4>');
+    
+  // 专门为元数据键添加特殊样式（例如 - **解决方案**:）
+  html = html.replace(/- \*\*([^*:]+)\*\*:/gm, (match, key) => {
+    return `- <span class="metadata-key">${key}:</span>`;
+  });
+  
+  // 继续处理其他Markdown元素
+  html = html
     // 将**文本**转换为粗体
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     // 将*文本*转换为斜体
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     // 将`代码`转换为内联代码
@@ -44,6 +52,22 @@ function simpleMarkdownToHtml(markdown: string): string {
     .replace(/<\/p><p>/g, '</p>\n<p>')
     .replace(/<\/ul><p>/g, '</ul>\n<p>')
     .replace(/<\/p><ul>/g, '</p>\n<ul>');
+  
+  // 添加元数据标签的CSS样式
+  const css = `
+  <style>
+    .metadata-key {
+      color: var(--primary-color, #11FCD4);
+      font-weight: bold;
+      font-size: 1.05em;
+      background-color: rgba(17, 252, 212, 0.08);
+      padding: 2px 5px;
+      border-radius: 3px;
+      margin-right: 5px;
+    }
+  </style>`;
+  
+  return html + css;
 }
 
 export default defineEventHandler(async (event: H3Event) => {
