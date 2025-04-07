@@ -1,10 +1,7 @@
 /**
  * 配置加载器
- * 用于加载WHOIS解析器所需的配置文件
+ * 用于加载WHOIS解析器所需的配置
  */
-
-import fs from 'fs';
-import path from 'path';
 
 /**
  * 配置缓存，避免重复加载
@@ -13,82 +10,36 @@ import path from 'path';
 const configCache = new Map<string, any>();
 
 /**
- * 配置文件基础路径
- */
-const CONFIG_BASE_PATH = path.resolve(process.cwd(), 'server/utils/whois-adapters/configs');
-
-/**
- * 确保配置目录存在
- * @returns 返回配置目录路径
- */
-function ensureConfigDirExists(): string {
-  if (!fs.existsSync(CONFIG_BASE_PATH)) {
-    try {
-      fs.mkdirSync(CONFIG_BASE_PATH, { recursive: true });
-    } catch (error) {
-      console.error(`无法创建配置目录 ${CONFIG_BASE_PATH}:`, error);
-    }
-  }
-  return CONFIG_BASE_PATH;
-}
-
-/**
- * 加载JSON配置文件
- * @param filename 配置文件名
- * @param defaultValue 默认值，当文件不存在时返回
+ * 加载配置
+ * @param configName 配置名称
+ * @param defaultValue 默认值，当配置不存在时返回
  * @returns 配置内容
  */
-export function loadJsonConfig<T = any>(filename: string, defaultValue: T): T {
-  // 规范化文件名
-  const normalizedFilename = filename.replace(/\\/g, '/');
+export function loadJsonConfig<T = any>(configName: string, defaultValue: T): T {
+  // 规范化配置名称
+  const normalizedConfigName = configName.replace(/\\/g, '/');
   
   // 检查缓存
-  if (configCache.has(normalizedFilename)) {
-    return configCache.get(normalizedFilename);
+  if (configCache.has(normalizedConfigName)) {
+    return configCache.get(normalizedConfigName);
   }
 
-  const configDir = ensureConfigDirExists();
-  const filePath = path.join(configDir, normalizedFilename);
+  // 使用内置默认配置
+  const config = getDefaultConfig(normalizedConfigName) || defaultValue;
   
-  // 如果文件不存在，尝试创建带有默认值的文件
-  if (!fs.existsSync(filePath)) {
-    try {
-      const defaultConfig = getDefaultConfig(normalizedFilename) || defaultValue;
-      fs.writeFileSync(filePath, JSON.stringify(defaultConfig, null, 2), 'utf8');
-      configCache.set(normalizedFilename, defaultConfig);
-      return defaultConfig;
-    } catch (error) {
-      console.warn(`无法创建配置文件 ${normalizedFilename}:`, error);
-      return defaultValue;
-    }
-  }
-  
-  // 读取并解析文件
-  try {
-    const content = fs.readFileSync(filePath, 'utf8');
-    try {
-      const config = JSON.parse(content);
-      configCache.set(normalizedFilename, config);
-      return config;
-    } catch (parseError) {
-      console.error(`解析配置文件 ${normalizedFilename} 时出错:`, parseError);
-      // 解析失败时返回默认值
-      return defaultValue;
-    }
-  } catch (readError) {
-    console.error(`读取配置文件 ${normalizedFilename} 时出错:`, readError);
-    return defaultValue;
-  }
+  // 缓存配置
+  configCache.set(normalizedConfigName, config);
+  return config;
 }
 
 /**
  * 获取默认配置
- * @param filename 配置文件名
+ * @param configName 配置名称
  * @returns 默认配置内容
  */
-function getDefaultConfig(filename: string): any {
-  // 为常用配置文件提供默认内容
-  switch (filename) {
+function getDefaultConfig(configName: string): any {
+  // 为常用配置提供默认内容
+  switch (configName) {
     case 'whois-parser-keys.json':
       return {
         "domain_id": [
@@ -181,36 +132,34 @@ function getDefaultConfig(filename: string): any {
 }
 
 /**
- * 保存JSON配置文件
- * @param filename 配置文件名
+ * 保存配置只更新内存缓存
+ * @param configName 配置名称
  * @param data 配置内容
- * @returns 是否成功保存
+ * @returns 是否成功更新缓存
  */
-export function saveJsonConfig(filename: string, data: any): boolean {
-  // 规范化文件名
-  const normalizedFilename = filename.replace(/\\/g, '/');
-  
-  const configDir = ensureConfigDirExists();
-  const filePath = path.join(configDir, normalizedFilename);
-  
+export function saveJsonConfig(configName: string, data: any): boolean {
   try {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
-    configCache.set(normalizedFilename, data); // 更新缓存
+    // 规范化配置名称
+    const normalizedConfigName = configName.replace(/\\/g, '/');
+    
+    // 更新内存缓存
+    configCache.set(normalizedConfigName, data);
+    console.log(`配置 ${normalizedConfigName} 已更新到内存缓存`);
     return true;
   } catch (error) {
-    console.error(`保存配置文件 ${normalizedFilename} 时出错:`, error);
+    console.error(`更新配置缓存 ${configName} 时出错:`, error);
     return false;
   }
 }
 
 /**
  * 清除配置缓存
- * @param filename 可选的特定文件名，如不提供则清除所有缓存
+ * @param configName 可选的特定配置名称，如不提供则清除所有缓存
  */
-export function clearConfigCache(filename?: string): void {
-  if (filename) {
-    const normalizedFilename = filename.replace(/\\/g, '/');
-    configCache.delete(normalizedFilename);
+export function clearConfigCache(configName?: string): void {
+  if (configName) {
+    const normalizedConfigName = configName.replace(/\\/g, '/');
+    configCache.delete(normalizedConfigName);
   } else {
     configCache.clear();
   }

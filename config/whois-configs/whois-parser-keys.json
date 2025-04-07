@@ -826,58 +826,5 @@
             "value": "Reseller",
             "tld":"cm"
         }
-    ],
-    "generic": {
-        "registrar": [
-            "registrar",
-            "registrar name",
-            "sponsoring registrar",
-            "registered through"
-        ],
-        "whoisServer": [
-            "whois server",
-            "registrar whois server"
-        ],
-        "nameServers": [
-            "name server",
-            "nameserver",
-            "nserver",
-            "name servers",
-            "nameservers"
-        ],
-        "creationDate": [
-            "created",
-            "creation date",
-            "registered on",
-            "registration date"
-        ],
-        "updatedDate": [
-            "updated",
-            "last updated",
-            "last modified",
-            "changed"
-        ],
-        "expiryDate": [
-            "expires",
-            "expiry date",
-            "expiration date",
-            "registry expiry date"
-        ],
-        "registrantName": [
-            "registrant name",
-            "registrant"
-        ],
-        "registrantOrganization": [
-            "registrant organization",
-            "registrant org"
-        ],
-        "registrantEmail": [
-            "registrant email",
-            "email"
-        ],
-        "status": [
-            "status",
-            "domain status"
-        ]
-    }
+    ]
 }
