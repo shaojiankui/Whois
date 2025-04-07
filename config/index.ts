@@ -89,6 +89,7 @@ function getConfig(): Config {
 
 // 导出配置实例
 const config = getConfig();
+console.log("load config:"+JSON.stringify(config));
 export default config;
 
 // 导出特定配置部分的便捷访问
