@@ -1,7 +1,11 @@
-import { promises as fs } from 'fs';
-import path from 'path';
 import { ResponseData } from '../utils/response';
 import type { H3Event } from 'h3';
+import fs from 'fs';
+import path from 'path';
+
+// 在构建时读取Note.md并将其内容嵌入到代码中
+// 这样在运行时不需要访问文件系统
+const CHANGELOG_CONTENT = fs.readFileSync(path.resolve(process.cwd(), 'Note.md'), 'utf-8');
 
 /**
  * 将Markdown转换为HTML的简单处理函数
@@ -48,25 +52,17 @@ function simpleMarkdownToHtml(markdown: string): string {
     .replace(/<\/p><ul>/g, '</p>\n<ul>');
 }
 
+// 预处理HTML内容
+const HTML_CONTENT = simpleMarkdownToHtml(CHANGELOG_CONTENT);
+
 export default defineEventHandler(async (event: H3Event) => {
   try {
-    // 获取项目根目录的路径
-    const rootDir = process.cwd();
-    // 构建Note.md的完整路径
-    const filePath = path.join(rootDir, 'Note.md');
-    
-    // 读取文件内容
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    
-    // 将Markdown转换为HTML
-    const htmlContent = simpleMarkdownToHtml(fileContent);
-    
-    // 返回HTML内容
+    // 直接返回构建时处理好的HTML内容
     return ResponseData.success({
-      content: htmlContent
+      content: HTML_CONTENT
     }, '成功获取更新日志');
   } catch (error: any) {
-    console.error('读取更新日志时出错:', error);
-    return ResponseData.error('无法读取更新日志', error.message);
+    console.error('获取更新日志时出错:', error);
+    return ResponseData.error('无法获取更新日志', error.message);
   }
 }); 
