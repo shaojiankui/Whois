@@ -82,23 +82,38 @@ h3 {
 }
 
 .w-button {
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     background-color: var(--primary-color);
-    color: #000;
-    font-size: 1.1rem;
+    color: var(--button-primary-text);
+    font-size: 1rem;
     font-weight: 600;
     border: none;
+    border-radius: $border-radius;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    text-align: center;
+    display: inline-block;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     
     &:hover {
       background-color: var(--hover-color);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
     &:disabled {
       background-color: #444;
       color: #888;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      opacity: 0.7;
     }
 }
 
@@ -111,11 +126,17 @@ h3 {
   color: var(--text-color);
   padding: $spacing-2;
   transition: border-color 0.2s ease;
+  width: 100%;
   
   &:focus {
     outline: none;
     border-color: var(--input-focus-border);
     box-shadow: 0 0 0 2px rgba($primary-color, 0.25);
+  }
+  
+  &::placeholder {
+    color: var(--muted-text);
+    opacity: 0.7;
   }
 }
 

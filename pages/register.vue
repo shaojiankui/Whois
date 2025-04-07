@@ -1,66 +1,70 @@
 <template>
   <div class="register-page">
-    <div class="register-container">
-      <h1>Create Account</h1>
+    <div class="register-container card">
+      <h1>{{ $t('auth.createAccount') }}</h1>
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
       </div>
       
       <form @submit.prevent="handleRegister" class="register-form">
         <div class="form-group">
-          <label for="username">Username</label>
+          <label for="username">{{ $t('auth.username') }}</label>
           <input 
             type="text" 
             id="username" 
             v-model="username" 
             required 
-            placeholder="Choose a username"
+            :placeholder="$t('auth.chooseUsername')"
+            class="w-input"
           />
         </div>
         
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="email">{{ $t('auth.email') }}</label>
           <input 
             type="email" 
             id="email" 
             v-model="email" 
             required 
-            placeholder="Enter your email"
+            :placeholder="$t('auth.enterEmail')"
+            class="w-input"
           />
         </div>
         
         <div class="form-group">
-          <label for="password">Password</label>
+          <label for="password">{{ $t('auth.password') }}</label>
           <input 
             type="password" 
             id="password" 
             v-model="password" 
             required 
-            placeholder="Create a password"
+            :placeholder="$t('auth.createPassword')"
             minlength="6"
+            class="w-input"
           />
-          <small>Password must be at least 6 characters</small>
+          <small class="text-muted">{{ $t('auth.passwordRequirement') }}</small>
         </div>
         
         <div class="form-group">
-          <label for="confirmPassword">Confirm Password</label>
+          <label for="confirmPassword">{{ $t('auth.confirmPassword') }}</label>
           <input 
             type="password" 
             id="confirmPassword" 
             v-model="confirmPassword" 
             required 
-            placeholder="Confirm your password"
+            :placeholder="$t('auth.confirmPasswordPlaceholder')"
+            class="w-input"
           />
         </div>
         
         <div class="form-actions">
-          <button type="submit" class="btn-primary" :disabled="isLoading || !isFormValid">
-            {{ isLoading ? 'Creating account...' : 'Create Account' }}
+          <button type="submit" class="w-button" :disabled="isLoading || !isFormValid">
+            {{ isLoading ? $t('auth.creatingAccount') : $t('auth.createAccount') }}
           </button>
         </div>
         
         <div class="form-links">
-          <NuxtLink to="/login">Already have an account? Login</NuxtLink>
+          <NuxtLink :to="localePath('/login')">{{ $t('auth.alreadyHaveAccount') }}</NuxtLink>
         </div>
       </form>
     </div>
@@ -70,6 +74,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import { useLocalePath } from '#i18n';
+
+// I18n
+const { t } = useI18n();
+const localePath = useLocalePath();
 
 // State
 const username = ref('');
@@ -94,9 +104,9 @@ const isFormValid = computed(() => {
 async function handleRegister() {
   if (!isFormValid.value) {
     if (password.value !== confirmPassword.value) {
-      errorMessage.value = 'Passwords do not match';
+      errorMessage.value = t('auth.passwordsDoNotMatch');
     } else if (password.value.length < 6) {
-      errorMessage.value = 'Password must be at least 6 characters';
+      errorMessage.value = t('auth.passwordTooShort');
     }
     return;
   }
@@ -120,13 +130,13 @@ async function handleRegister() {
     const data = await response.json();
     
     if (!response.ok) {
-      throw new Error(data.message || 'Registration failed');
+      throw new Error(data.message || t('auth.registrationFailed'));
     }
     
     // Success, redirect to login page
     router.push('/login?registered=true');
   } catch (error: any) {
-    errorMessage.value = error.message || 'An error occurred during registration';
+    errorMessage.value = error.message || t('auth.errorOccurred');
   } finally {
     isLoading.value = false;
   }
@@ -146,15 +156,12 @@ async function handleRegister() {
   width: 100%;
   max-width: 400px;
   padding: 2rem;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
   text-align: center;
   margin-bottom: 2rem;
-  color: #333;
+  color: var(--text-color);
 }
 
 .register-form {
@@ -171,70 +178,43 @@ h1 {
 
 label {
   font-weight: 500;
-  color: #555;
-}
-
-input {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-input:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  color: var(--text-color);
 }
 
 small {
-  color: #7f8c8d;
+  color: var(--muted-text);
   font-size: 0.8rem;
 }
 
-.btn-primary {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 0.75rem;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.btn-primary:hover {
-  background-color: #2980b9;
-}
-
-.btn-primary:disabled {
-  background-color: #95a5a6;
-  cursor: not-allowed;
-}
-
 .error-message {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--error-color);
   padding: 0.75rem;
   border-radius: 4px;
   margin-bottom: 1rem;
+  border: 1px solid var(--error-color);
+}
+
+.form-actions {
+  margin-top: 1rem;
 }
 
 .form-links {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
   font-size: 0.9rem;
+  text-align: center;
 }
 
 .form-links a {
-  color: #3498db;
+  color: var(--primary-color);
   text-decoration: none;
 }
 
 .form-links a:hover {
+  color: var(--hover-color);
   text-decoration: underline;
 }
 </style> 
