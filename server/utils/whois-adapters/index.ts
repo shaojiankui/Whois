@@ -4,6 +4,7 @@ import { ParserWhoisAdapter } from './parser-adapter';
 import TcpQueryHandler from './tcp-query';
 import RdapQueryHandler from './rdap-query';
 import { DomainInfo } from '~/types/domain';
+import config from '~/config';
 
 /**
  * WHOIS查询处理器接口
@@ -109,4 +110,5 @@ export function initWhoisAdapters(): void {
   registerParseHandler(ParseHandlerType.PARSER, new ParserWhoisAdapter());
   
   console.log('WHOIS适配器系统已初始化');
+  console.log('✅ 全局配置：'+JSON.stringify(config));
 } 
