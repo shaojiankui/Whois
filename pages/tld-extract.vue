@@ -250,4 +250,7 @@ h3 {
   background-color: var(--primary-color);
   color: #000;
 }
+.w-button{
+    width: 150px;
+}
 </style> 

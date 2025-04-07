@@ -111,7 +111,11 @@
     "contact": "联系我们",
     "about": "关于我们",
     "copyright": "版权所有 © {year} Whois查询系统. 保留所有权利.",
-    "rights": "保留所有权利"
+    "rights": "保留所有权利",
+    "changelog": "更新日志",
+    "githubLink": "在GitHub上查看源代码",
+    "twitterLink": "在Twitter上关注我们",
+    "changelogLink": "查看应用更新历史"
   },
   "home": {
     "title": "域名Whois信息查询",
@@ -547,5 +551,9 @@
     "dangerBadgeUsage": "表示危急状态",
     "infoBadge": "信息",
     "infoBadgeUsage": "表示信息状态"
+  },
+  "changelog": {
+    "title": "更新日志",
+    "loading": "正在加载更新日志..."
   }
 }

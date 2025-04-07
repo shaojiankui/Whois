@@ -183,4 +183,7 @@ const saveToRecentSearches = (domain: string) => {
     margin-bottom: 0;
   }
 }
+.w-button{
+    width: 150px;
+}
 </style> 

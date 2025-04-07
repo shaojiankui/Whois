@@ -105,7 +105,11 @@
     "contact": "Contact Us",
     "about": "About Us",
     "copyright": "Copyright © {year} Whois Lookup System. All rights reserved.",
-    "rights": "All Rights Reserved"
+    "rights": "All Rights Reserved",
+    "changelog": "Changelog",
+    "githubLink": "View source code on GitHub",
+    "twitterLink": "Follow us on Twitter",
+    "changelogLink": "View application update history"
   },
   "home": {
     "title": "Domain Whois Information Lookup",
@@ -540,5 +544,9 @@
     "dangerBadgeUsage": "Indicates critical status",
     "infoBadge": "Info",
     "infoBadgeUsage": "Indicates informational status"
+  },
+  "changelog": {
+    "title": "Changelog",
+    "loading": "Loading changelog..."
   }
 } 
