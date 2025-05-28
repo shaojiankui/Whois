@@ -49,6 +49,12 @@
                     <NuxtLink :to="localePath('/history')" class="user-menu-item">
                       {{ $t('user.history') }}
                     </NuxtLink>
+                    <template v-if="isAdmin">
+                      <hr class="menu-divider" />
+                      <NuxtLink :to="localePath('/admin')" class="user-menu-item admin-link">
+                        🛡️ {{ $t('admin.dashboard') }}
+                      </NuxtLink>
+                    </template>
                     <hr class="menu-divider" />
                     <NuxtLink :to="localePath('/ui-guide')" class="user-menu-item">
                       {{ $t('ui.designSystem') }}
@@ -90,6 +96,9 @@
           <NuxtLink :to="localePath('/favorites')" class="nav-link" @click="closeMobileMenu">{{ $t('user.favorites') }}</NuxtLink>
           <NuxtLink :to="localePath('/history')" class="nav-link" @click="closeMobileMenu">{{ $t('user.history') }}</NuxtLink>
           <NuxtLink :to="localePath('/settings')" class="nav-link" @click="closeMobileMenu">{{ $t('user.settings') }}</NuxtLink>
+          <template v-if="isAdmin">
+            <NuxtLink :to="localePath('/admin')" class="nav-link admin-link" @click="closeMobileMenu">🛡️ {{ $t('admin.dashboard') }}</NuxtLink>
+          </template>
           <button @click="logoutMobile" class="nav-link logout">{{ $t('header.logout') }}</button>
         </template>
       </nav>
@@ -100,11 +109,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useLocalePath } from '#i18n';
+import { useLocalePath } from '#imports';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '~/composables/useAuthStore';
 
 // 国际化
-const { locale, locales,setLocale } = useI18n();
+const { locale, locales, setLocale } = useI18n();
 const localePath = useLocalePath();
 const selectedLocale = ref(locale.value);
 const availableLocales = computed(() => locales.value);
@@ -119,49 +129,19 @@ const showUserMenu = ref(false);
 const userMenuTrigger = ref(null);
 
 // 用户登录状态
-const isLoggedIn = ref(false);
-const userName = ref('');
-const userInitials = computed(() => {
-  if (!userName.value) return '';
-  return userName.value.split(' ').map(n => n[0]).join('').toUpperCase();
-});
-
-// 用户相关变量
-const avatarRef = ref(null);
+const authStore = useAuthStore();
+const isLoggedIn = computed(() => authStore.isLoggedIn);
+const userName = computed(() => authStore.user?.username || '');
 const initialLetter = computed(() => {
   if (!userName.value) return 'U';
   return userName.value.charAt(0).toUpperCase();
 });
 
-// 获取当前用户信息
-const fetchUserInfo = async () => {
-  try {
-    const response = await fetch('/api/user/me', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include'
-    });
-    
-    if (response.ok) {
-      const result = await response.json();
-      console.log('User info response:', result); // 添加调试信息
-      if (result.code === 200 && result.data) {
-        isLoggedIn.value = true;
-        userName.value = result.data.name || result.data.username || 'User';
-        console.log('User name set to:', userName.value); // 添加调试信息
-      } else {
-        isLoggedIn.value = false;
-      }
-    } else {
-      isLoggedIn.value = false;
-    }
-  } catch (error) {
-    console.error('Failed to fetch user info:', error);
-    isLoggedIn.value = false;
-  }
-};
+// 检查是否为管理员
+const isAdmin = computed(() => authStore.isAdmin);
+
+// 用户相关变量
+const avatarRef = ref(null);
 
 // 切换语言
 const changeLocale = () => {
@@ -188,22 +168,11 @@ const toggleUserMenu = () => {
 // 注销处理函数
 const handleLogout = async () => {
   try {
-    const response = await fetch('/api/user/logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include'
-    });
+    await authStore.logout();
+    router.push(localePath('/'));
     
-    if (response.ok) {
-      isLoggedIn.value = false;
-      showUserMenu.value = false;
-      router.push(localePath('/'));
-      
-      // 刷新页面以更新导航栏状态
-      window.location.reload();
-    }
+    // 刷新页面以更新导航栏状态
+    window.location.reload();
   } catch (error) {
     console.error('Logout failed:', error);
   }
@@ -259,6 +228,15 @@ watch(() => locale.value, (newLocale) => {
 watch(() => router.currentRoute.value.path, () => {
   fetchUserInfo();
 });
+
+// 获取当前用户信息
+const fetchUserInfo = async () => {
+  try {
+    await authStore.fetchUserInfo();
+  } catch (error) {
+    console.error('Failed to fetch user info:', error);
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -436,20 +414,35 @@ watch(() => router.currentRoute.value.path, () => {
           .user-menu-item {
             display: block;
             padding: 0.75rem 1rem;
-            color: var(--text-color);
             text-decoration: none;
-            border-radius: 0.25rem;
-            transition: background-color 0.2s;
+            color: var(--text-color);
+            transition: background-color 0.2s ease;
             
             &:hover {
-              background-color: rgba(0, 0, 0, 0.05);
+              background-color: var(--hover-bg);
             }
             
             &.logout {
               color: var(--error-color);
+              background: none;
+              border: none;
+              width: 100%;
+              text-align: left;
+              cursor: pointer;
               
               &:hover {
-                background-color: rgba(239, 68, 68, 0.1);
+                background-color: rgba(231, 76, 60, 0.1);
+              }
+            }
+            
+            &.admin-link {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              font-weight: 600;
+              
+              &:hover {
+                background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+                transform: translateX(2px);
               }
             }
           }
@@ -534,32 +527,54 @@ watch(() => router.currentRoute.value.path, () => {
       padding: 1rem;
       
       .nav-link {
+        display: block;
         padding: 1rem;
         color: var(--text-color);
         text-decoration: none;
-        font-weight: 500;
         border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.3s ease;
         
-        &:hover, &.router-link-active {
-          color: var(--primary-color);
+        &:hover {
+          background-color: var(--hover-bg);
         }
         
         &.auth {
-          margin-top: 1rem;
+          background-color: var(--primary-color);
+          color: #000;
+          font-weight: 600;
+          border-radius: 0.5rem;
+          margin: 0.5rem;
+          border: none;
+          
+          &:hover {
+            background-color: var(--hover-color);
+          }
         }
         
         &.logout {
           color: var(--error-color);
           background: none;
           border: none;
-          cursor: pointer;
+          width: 100%;
           text-align: left;
-          font-size: 1rem;
-          padding: 1rem;
-          font-weight: 500;
+          cursor: pointer;
           
           &:hover {
-            color: var(--error-color);
+            background-color: rgba(231, 76, 60, 0.1);
+          }
+        }
+        
+        &.admin-link {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          font-weight: 600;
+          margin: 0.5rem;
+          border-radius: 0.5rem;
+          border: none;
+          
+          &:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateX(2px);
           }
         }
       }

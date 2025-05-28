@@ -1,4 +1,4 @@
-import { defineStore } from '#imports';
+import { ref, computed } from 'vue';
 
 interface User {
   id: number;
@@ -10,20 +10,20 @@ interface UserPreferences {
   [key: string]: string;
 }
 
-interface AuthState {
-  user: User | null;
-  token: string | null;
-  preferences: UserPreferences;
-}
+// 全局状态
+const user = ref<User | null>(null);
+const token = ref<string | null>(null);
+const preferences = ref<UserPreferences>({});
 
-export const useAuthStore = defineStore('auth', () => {
-  // State using refs for Vue 3 reactivity
-  const user = ref<User | null>(null);
-  const token = ref<string | null>(null);
-  const preferences = ref<UserPreferences>({});
-
+export const useAuthStore = () => {
   // Getters
   const isAuthenticated = computed(() => !!user.value);
+  const isLoggedIn = computed(() => !!user.value);
+  const isAdmin = computed(() => {
+    if (!user.value) return false;
+    // 用户ID为1的用户是管理员
+    return user.value.id === 1;
+  });
   const getPreference = (key: string) => preferences.value[key];
 
   // Actions
@@ -188,6 +188,40 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function fetchUserInfo() {
+    try {
+      const response = await fetch('/api/user/me', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.code === 200 && result.data) {
+          user.value = {
+            id: result.data.id,
+            username: result.data.username,
+            email: result.data.email
+          };
+          return { success: true, user: user.value };
+        } else {
+          user.value = null;
+          return { success: false, error: result.message || 'Failed to get user info' };
+        }
+      } else {
+        user.value = null;
+        return { success: false, error: 'Not authenticated' };
+      }
+    } catch (error: any) {
+      console.error('Failed to fetch user info:', error);
+      user.value = null;
+      return { success: false, error: error.message };
+    }
+  }
+
   return {
     // State
     user,
@@ -196,6 +230,8 @@ export const useAuthStore = defineStore('auth', () => {
     
     // Getters
     isAuthenticated,
+    isLoggedIn,
+    isAdmin,
     getPreference,
     
     // Actions
@@ -205,6 +241,7 @@ export const useAuthStore = defineStore('auth', () => {
     requestPasswordReset,
     resetPassword,
     loadPreferences,
-    setPreference
+    setPreference,
+    fetchUserInfo
   };
-}); 
+}; 

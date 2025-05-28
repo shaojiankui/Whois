@@ -113,6 +113,18 @@ import { ref, computed, onBeforeUnmount, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { apiGet } from '~/utils/api';
 
+// 定义结果类型
+interface BulkCheckResult {
+  domain: string;
+  status: 'pending' | 'available' | 'taken' | 'reserved' | 'error' | 'cancelled';
+  details: {
+    checked?: string;
+    message?: string;
+    fromCache?: boolean;
+    error?: string;
+  } | null;
+}
+
 // 获取i18n实例
 const { t } = useI18n();
 
@@ -121,7 +133,7 @@ const domainsInput = ref('');
 
 // 处理状态
 const isProcessing = ref(false);
-const results = ref([]);
+const results = ref<BulkCheckResult[]>([]);
 const checkedDomains = ref(0);
 const totalDomains = ref(0);
 const stopProcessing = ref(false);
@@ -152,8 +164,8 @@ const progressPercentage = computed(() => {
   return Math.round((checkedDomains.value / totalDomains.value) * 100);
 });
 
-// 使用EventSource流式查询批量域名
-const streamCheckDomains = async () => {
+// 开始批量查询
+const startCheck = async () => {
   if (!hasValidDomains.value || isProcessing.value) return;
   
   // 解析域名列表
@@ -177,127 +189,62 @@ const streamCheckDomains = async () => {
   checkedDomains.value = 0;
   
   try {
-    // 创建POST请求数据
-    const requestData = {
-      domains: domains
-    };
-    
-    // 创建EventSource连接
-    let eventSource = new EventSource('/api/bulk-stream', {
-      withCredentials: true
-    });
-    
-    // 发送请求数据（使用fetch POST请求）
-    fetch('/api/bulk-stream', {
+    // 使用普通的POST请求进行批量查询
+    const response = await fetch('/api/bulk-check', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(requestData)
+      body: JSON.stringify({ domains })
     });
     
-    // 监听初始化事件
-    eventSource.addEventListener('init', (e) => {
-      const data = JSON.parse(e.data);
-      console.log('Bulk check initialized:', data);
-    });
+    if (!response.ok) {
+      throw new Error('网络请求失败');
+    }
     
-    // 监听验证事件
-    eventSource.addEventListener('validation', (e) => {
-      const data = JSON.parse(e.data);
-      console.log('Domain validation results:', data);
-      
-      // 更新无效域名的状态
-      if (data.invalidDomains && data.invalidDomains.length > 0) {
-        data.invalidDomains.forEach(invalidDomain => {
-          const index = domains.findIndex(d => d === invalidDomain.original);
-          if (index !== -1) {
-            results.value[index].status = 'error';
-            results.value[index].details = { error: invalidDomain.error };
-            checkedDomains.value++;
-          }
-        });
-      }
-    });
+    const data = await response.json();
     
-    // 监听结果事件
-    eventSource.addEventListener('result', (e) => {
-      const data = JSON.parse(e.data);
-      
-      // 查找对应的域名索引
-      const index = domains.findIndex(d => d === data.domain);
-      
-      if (index !== -1 && !stopProcessing.value) {
-        // 更新当前域名的结果
-        if (data.error) {
-          results.value[index].status = 'error';
-          results.value[index].details = { error: data.error };
-        } else {
-          results.value[index].status = data.isAvailable ? 'available' : 'taken';
-          results.value[index].details = {
-            checked: new Date().toISOString(),
-            message: data.message,
-            fromCache: data.fromCache || false
+    if (data.code === 200) {
+      // 更新所有结果
+      data.data.results.forEach((result: any) => {
+        const index = domains.findIndex(d => d === result.domain);
+        if (index !== -1) {
+          results.value[index] = {
+            domain: result.domain,
+            status: result.status,
+            details: {
+              checked: result.timestamp,
+              message: result.message || result.error,
+              fromCache: false
+            }
           };
         }
-        
-        // 更新进度
-        checkedDomains.value = data.index + 1;
-      }
-    });
+      });
+      
+      checkedDomains.value = domains.length;
+    } else {
+      throw new Error(data.message || '查询失败');
+    }
     
-    // 监听完成事件
-    eventSource.addEventListener('complete', (e) => {
-      const data = JSON.parse(e.data);
-      console.log('Bulk check completed:', data);
-      
-      isProcessing.value = false;
-      eventSource.close();
-    });
-    
-    // 监听错误事件
-    eventSource.addEventListener('error', (e) => {
-      let errorData = {};
-      try {
-        errorData = JSON.parse(e.data);
-      } catch (err) {
-        errorData = { error: 'Stream connection error' };
-      }
-      
-      console.error('Bulk check error:', errorData);
-      
-      // 标记所有未完成的域名为错误状态
-      if (!stopProcessing.value) {
-        results.value.forEach((result, idx) => {
-          if (result.status === 'pending') {
-            result.status = 'error';
-            result.details = { error: 'Stream connection lost' };
-            checkedDomains.value++;
-          }
-        });
-      }
-      
-      isProcessing.value = false;
-      eventSource.close();
-    });
-    
-    // 关闭处理
-    onBeforeUnmount(() => {
-      if (eventSource && eventSource.readyState !== 2) {
-        eventSource.close();
-      }
-    });
   } catch (error) {
-    console.error('Failed to start bulk check:', error);
+    console.error('Bulk check failed:', error);
+    
+    // 标记所有域名为错误状态
+    results.value.forEach((result, idx) => {
+      if (result.status === 'pending') {
+        result.status = 'error';
+        result.details = { error: '查询失败' };
+      }
+    });
+    
+    checkedDomains.value = domains.length;
+  } finally {
     isProcessing.value = false;
   }
 };
 
-// 开始批量查询
-const startCheck = streamCheckDomains;
-
 // 检查单个域名
-const checkDomain = async (domain, index) => {
+const checkDomain = async (domain: string, index: number) => {
   try {
     // 使用API工具调用
     const data = await apiGet(`/api/available?domain=${encodeURIComponent(domain)}`);
@@ -312,7 +259,7 @@ const checkDomain = async (domain, index) => {
       };
       checkedDomains.value++;
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error(`Error checking domain ${domain}:`, err);
     if (!stopProcessing.value) {
       results.value[index].status = 'error';
@@ -345,20 +292,22 @@ const exportToCsv = () => {
     ...rows.map(row => row.join(','))
   ].join('\n');
   
-  // 创建下载链接
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.setAttribute('href', url);
-  link.setAttribute('download', `domain-check-${new Date().toISOString().slice(0, 10)}.csv`);
-  link.style.visibility = 'hidden';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  // 创建下载链接（仅在客户端执行）
+  if (process.client && typeof window !== 'undefined') {
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = (globalThis as any).document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `domain-check-${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    (globalThis as any).document.body.appendChild(link);
+    link.click();
+    (globalThis as any).document.body.removeChild(link);
+  }
 };
 
 // 获取状态样式类
-const getStatusClass = (status) => {
+const getStatusClass = (status: string) => {
   switch (status) {
     case 'available': return 'status-available';
     case 'taken': return 'status-taken';
@@ -370,7 +319,7 @@ const getStatusClass = (status) => {
 };
 
 // 获取状态文本
-const getStatusText = (status) => {
+const getStatusText = (status: string) => {
   switch (status) {
     case 'available': return t('whois.available');
     case 'taken': return t('whois.notAvailable');

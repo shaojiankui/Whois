@@ -1,428 +1,529 @@
 <template>
-  <div class="history-page-container">
-    <h1 class="page-title">{{ $t('user.history') }}</h1>
-    
-    <div v-if="!isLoggedIn" class="login-required">
-      <p>{{ $t('user.loginRequired') }}</p>
-      <NuxtLink :to="localePath('/login')" class="login-link">
-        {{ $t('header.login') }}
-      </NuxtLink>
-    </div>
-    
-    <div v-else-if="loading" class="loading-state">
-      <div class="spinner"></div>
-      <p>{{ $t('common.loading') }}</p>
-    </div>
-    
-    <div v-else-if="error" class="error-state">
-      <p class="error-message">{{ error }}</p>
-      <button @click="fetchHistory" class="retry-button">
-        {{ $t('common.retry') }}
-      </button>
-    </div>
-    
-    <div v-else-if="historyItems.length === 0" class="empty-state">
-      <p>{{ $t('common.noRecords') }}</p>
-    </div>
-    
-    <div v-else class="history-content">
-      <table class="history-table">
-        <thead>
-          <tr>
-            <th>{{ $t('common.domain') }}</th>
-            <th>{{ $t('common.tag') }}</th>
-            <th>{{ $t('common.searchTime') }}</th>
-            <th>{{ $t('common.actions') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in historyItems" :key="index">
-            <td>
-              <NuxtLink :to="localePath(`/${item.domain}`)" class="domain-link">
-                {{ item.domain }}
-              </NuxtLink>
-            </td>
-            <td>
-              <span class="tag" :class="getTagClass(item.tag)">
-                {{ item.tag || 'whois' }}
-              </span>
-            </td>
-            <td>{{ formatDate(item.add_time) }}</td>
-            <td>
-              <div class="action-buttons">
-                <button class="view-button" @click="navigateToDomain(item.domain)">
-                  {{ $t('common.view') }}
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <div class="history-page">
+    <div class="container">
+      <h1 class="page-title">{{ $t('history.title') }}</h1>
+      <p class="page-description">{{ $t('history.description') }}</p>
       
-      <!-- 分页控制 -->
-      <div class="pagination">
-        <button 
-          class="pagination-button" 
-          :disabled="currentPage === 1"
-          @click="changePage(currentPage - 1)"
-        >
-          {{ $t('common.previous') }}
-        </button>
+      <div v-if="isLoading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>{{ $t('common.loading') }}</p>
+      </div>
+      
+      <div v-else-if="error" class="error-container">
+        <div class="error-icon">❌</div>
+        <p>{{ error }}</p>
+        <button @click="fetchHistory" class="retry-button">{{ $t('common.retry') }}</button>
+      </div>
+      
+      <div v-else-if="!isLoggedIn" class="auth-required">
+        <div class="auth-message">
+          <h2>{{ $t('auth.loginRequired') }}</h2>
+          <p>{{ $t('history.loginToView') }}</p>
+          <NuxtLink :to="localePath('/login')" class="login-button">
+            {{ $t('auth.login') }}
+          </NuxtLink>
+        </div>
+      </div>
+      
+      <div v-else-if="historyItems.length === 0" class="no-history">
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <h2>{{ $t('history.noHistory') }}</h2>
+          <p>{{ $t('history.startSearching') }}</p>
+          <NuxtLink :to="localePath('/')" class="search-button">
+            {{ $t('history.startSearch') }}
+          </NuxtLink>
+        </div>
+      </div>
+      
+      <div v-else class="history-content">
+        <div class="history-stats">
+          <div class="stat-card">
+            <div class="stat-number">{{ historyItems.length }}</div>
+            <div class="stat-label">{{ $t('history.totalQueries') }}</div>
+          </div>
+        </div>
         
-        <span class="page-indicator">{{ $t('common.page') }} {{ currentPage }}</span>
+        <div class="history-list">
+          <div 
+            v-for="item in historyItems" 
+            :key="item.id" 
+            class="history-item"
+            @click="viewDomain(item.domain)"
+          >
+            <div class="item-header">
+              <div class="domain-name">{{ item.domain }}</div>
+              <div class="query-time">{{ formatDate(item.add_time) }}</div>
+            </div>
+            
+            <div class="item-details">
+              <div v-if="item.tag" class="domain-tag">
+                {{ item.tag }}
+              </div>
+              
+              <div class="price-info" v-if="item.reg_price">
+                <span class="price-label">{{ $t('history.regPrice') }}:</span>
+                <span class="price-value">${{ item.reg_price }}</span>
+              </div>
+            </div>
+            
+            <div class="item-actions">
+              <button 
+                @click.stop="viewDomain(item.domain)" 
+                class="view-button"
+              >
+                {{ $t('history.viewDetails') }}
+              </button>
+              <button 
+                @click.stop="deleteHistoryItem(item.id)" 
+                class="delete-button"
+                :title="$t('history.deleteItem')"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+        </div>
         
-        <button 
-          class="pagination-button" 
-          :disabled="historyItems.length < itemsPerPage"
-          @click="changePage(currentPage + 1)"
-        >
-          {{ $t('common.next') }}
-        </button>
+        <div v-if="pagination.hasMore" class="load-more">
+          <button 
+            @click="loadMore" 
+            class="load-more-button"
+            :disabled="isLoadingMore"
+          >
+            {{ isLoadingMore ? $t('common.loading') : $t('history.loadMore') }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useLocalePath } from '#i18n';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import dayjs from 'dayjs';
-import { apiGet } from '~/utils/api';
+import { useI18n } from 'vue-i18n';
+import { useAuthStore } from '~/composables/useAuthStore';
 
+// Types
+interface QueryHistory {
+  id: number;
+  user_id: number;
+  domain: string;
+  tag?: string;
+  premium?: number;
+  reg_price?: number;
+  renew_price?: number;
+  flag?: number;
+  add_time: string;
+  update_time: string;
+  uuid?: string;
+}
+
+interface Pagination {
+  page: number;
+  pageSize: number;
+  total: number;
+  hasMore: boolean;
+}
+
+// Composables
 const { t } = useI18n();
-const localePath = useLocalePath();
 const router = useRouter();
+const authStore = useAuthStore();
 
-// 状态变量
-const isLoggedIn = ref(false);
-const loading = ref(true);
-const error = ref<string | null>(null);
-const historyItems = ref<any[]>([]);
+// State
+const historyItems = ref<QueryHistory[]>([]);
+const isLoading = ref(true);
+const isLoadingMore = ref(false);
+const error = ref('');
+const pagination = ref<Pagination>({
+  page: 1,
+  pageSize: 20,
+  total: 0,
+  hasMore: false
+});
 
-// 分页
-const currentPage = ref(1);
-const itemsPerPage = ref(20);
+// Computed
+const isLoggedIn = computed(() => authStore.isLoggedIn);
 
-// 检查用户是否登录
-const checkUserAuth = async () => {
+// Methods
+const fetchHistory = async (page: number = 1) => {
   try {
-    const userData = await apiGet('/api/user/me');
-    isLoggedIn.value = !!userData;
-    return isLoggedIn.value;
-  } catch (error) {
-    console.error('Error checking authentication:', error);
-    isLoggedIn.value = false;
-    return false;
-  }
-};
-
-// 获取历史记录
-const fetchHistory = async () => {
-  if (!isLoggedIn.value) return;
-  
-  loading.value = true;
-  error.value = null;
-  
-  try {
-    console.log('Fetching history with page:', currentPage.value, 'limit:', itemsPerPage.value);
+    if (page === 1) {
+      isLoading.value = true;
+      error.value = '';
+    } else {
+      isLoadingMore.value = true;
+    }
     
-    const params = {
-      page: currentPage.value,
-      limit: itemsPerPage.value
-    };
+    const response = await fetch(`/api/user/history?page=${page}&pageSize=${pagination.value.pageSize}`);
+    const data = await response.json();
     
-    const data = await apiGet('/api/user/history', params);
-    console.log('Fetched history data:', data);
+    if (!response.ok) {
+      throw new Error(data.message || t('history.fetchError'));
+    }
     
-    historyItems.value = data.history;
-    console.log('Fetched history items:', historyItems.value.length);
+    if (page === 1) {
+      historyItems.value = data.data.data;
+    } else {
+      historyItems.value.push(...data.data.data);
+    }
+    
+    pagination.value = data.data.pagination;
+    
   } catch (err: any) {
     console.error('Error fetching history:', err);
-    error.value = err.message || 'Failed to fetch history';
+    error.value = err.message || t('history.fetchError');
   } finally {
-    loading.value = false;
+    isLoading.value = false;
+    isLoadingMore.value = false;
   }
 };
 
-// 格式化日期
-const formatDate = (dateString) => {
-  if (!dateString) return '-';
-  return dayjs(dateString).format('YYYY-MM-DD HH:mm:ss');
+const loadMore = () => {
+  if (!pagination.value.hasMore || isLoadingMore.value) return;
+  fetchHistory(pagination.value.page + 1);
 };
 
-// 根据标签获取CSS类
-const getTagClass = (tag) => {
-  const tagMap = {
-    'whois': 'tag-whois',
-    'dns': 'tag-dns',
-    'bulk': 'tag-bulk',
-    'extract': 'tag-extract'
-  };
+const viewDomain = (domain: string) => {
+  router.push(`/${domain}`);
+};
+
+const deleteHistoryItem = async (id: number) => {
+  if (process.client && !(globalThis as any).confirm(t('history.confirmDelete'))) {
+    return;
+  }
   
-  return tagMap[tag] || 'tag-default';
+  try {
+    const response = await fetch(`/api/user/history/${id}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) {
+      throw new Error(t('history.deleteError'));
+    }
+    
+    // Remove item from list
+    historyItems.value = historyItems.value.filter(item => item.id !== id);
+    
+  } catch (err: any) {
+    console.error('Error deleting history item:', err);
+    if (process.client) {
+      (globalThis as any).alert(err.message || t('history.deleteError'));
+    }
+  }
 };
 
-// 导航到域名
-const navigateToDomain = (domain) => {
-  router.push(localePath(`/${domain}`));
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleString();
 };
 
-// 切换页面
-const changePage = (page) => {
-  if (page < 1) return;
-  currentPage.value = page;
-  fetchHistory();
-};
-
-// 组件挂载
-onMounted(async () => {
-  await checkUserAuth();
-  
+// Lifecycle
+onMounted(() => {
   if (isLoggedIn.value) {
-    await fetchHistory();
+    fetchHistory();
   } else {
-    loading.value = false;
+    isLoading.value = false;
   }
 });
 </script>
 
-<style lang="scss" scoped>
-.history-page-container {
-  max-width: 1200px;
-  margin: 0 auto;
+<style scoped>
+.history-page {
+  min-height: 80vh;
   padding: 2rem 1rem;
 }
 
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .page-title {
-  margin-bottom: 2rem;
   font-size: 2rem;
-  color: var(--text-color);
-}
-
-.login-required {
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  padding: 2rem;
+  margin-bottom: 0.5rem;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  
-  p {
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-    color: var(--text-color);
-  }
-  
-  .login-link {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    background-color: var(--primary-color);
-    color: var(--bg-color);
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: 500;
-    transition: background-color 0.2s;
-    
-    &:hover {
-      background-color: var(--hover-color);
-    }
-  }
 }
 
-.loading-state, .error-state, .empty-state {
+.page-description {
+  color: var(--muted-text);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.loading-container,
+.error-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  background-color: var(--card-bg);
+  padding: 3rem;
+  background: var(--card-bg);
   border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  
-  p {
-    margin-top: 1rem;
-    color: var(--text-color);
-  }
+  box-shadow: var(--card-shadow);
 }
 
-.spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: var(--primary-color);
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color);
+  border-top: 4px solid var(--primary-color);
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
   animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.error-message {
-  color: var(--error-color) !important;
+.error-icon {
+  font-size: 3rem;
   margin-bottom: 1rem;
 }
 
 .retry-button {
-  padding: 0.5rem 1rem;
-  background-color: var(--primary-color);
-  color: var(--bg-color);
+  padding: 0.8rem 1.5rem;
+  background: var(--primary-color);
+  color: #000;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-weight: 500;
-  
-  &:hover {
-    background-color: var(--hover-color);
-  }
+  margin-top: 1rem;
 }
 
-.history-content {
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.history-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1.5rem;
-  
-  th, td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-  }
-  
-  th {
-    font-weight: 600;
-    color: var(--text-color);
-    background-color: var(--card-bg);
-  }
-  
-  td {
-    color: var(--text-color);
-  }
-  
-  tr:last-child td {
-    border-bottom: none;
-  }
-  
-  tr:hover td {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-  
-  .domain-link {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
-    
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-  
-  .tag {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  
-  .tag-whois {
-    background-color: rgba(17, 252, 212, 0.15);
-    color: var(--primary-color);
-  }
-  
-  .tag-dns {
-    background-color: rgba(59, 130, 246, 0.15);
-    color: #3b82f6;
-  }
-  
-  .tag-bulk {
-    background-color: rgba(245, 158, 11, 0.15);
-    color: var(--warning-color);
-  }
-  
-  .tag-extract {
-    background-color: rgba(16, 185, 129, 0.15);
-    color: var(--success-color);
-  }
-  
-  .tag-default {
-    background-color: rgba(107, 114, 128, 0.15);
-    color: #6b7280;
-  }
-  
-  .action-buttons {
-    display: flex;
-    gap: 0.5rem;
-  }
-  
-  .view-button {
-    padding: 0.25rem 0.5rem;
-    background-color: var(--primary-color);
-    color: var(--bg-color);
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
-    
-    &:hover {
-      background-color: var(--hover-color);
-    }
-  }
-}
-
-.pagination {
+.auth-required {
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 60vh;
+}
+
+.auth-message {
+  text-align: center;
+  background: var(--card-bg);
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+}
+
+.auth-message h2 {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.login-button {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background: var(--primary-color);
+  color: #000;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+.no-history {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.empty-state {
+  text-align: center;
+  background: var(--card-bg);
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.search-button {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background: var(--primary-color);
+  color: #000;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+.history-stats {
+  display: flex;
   gap: 1rem;
-  
-  .pagination-button {
-    padding: 0.5rem 1rem;
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    
-    &:hover:not(:disabled) {
-      background-color: var(--primary-color);
-      color: var(--bg-color);
-      border-color: var(--primary-color);
-    }
-    
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-  
-  .page-indicator {
-    color: var(--text-color);
-  }
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  text-align: center;
+  min-width: 120px;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--muted-text);
+  margin-top: 0.5rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.history-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--card-shadow);
+}
+
+.history-item:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.domain-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.query-time {
+  font-size: 0.9rem;
+  color: var(--muted-text);
+}
+
+.item-details {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.domain-tag {
+  background: var(--primary-color);
+  color: #000;
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.price-info {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.price-label {
+  color: var(--muted-text);
+  font-size: 0.9rem;
+}
+
+.price-value {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.item-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.view-button,
+.delete-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.view-button {
+  background: var(--primary-color);
+  color: #000;
+}
+
+.view-button:hover {
+  background: var(--hover-color);
+}
+
+.delete-button {
+  background: var(--error-color);
+  color: white;
+  min-width: 40px;
+}
+
+.delete-button:hover {
+  opacity: 0.8;
+}
+
+.load-more {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.load-more-button {
+  padding: 0.8rem 2rem;
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.load-more-button:hover:not(:disabled) {
+  background: var(--primary-color);
+  color: #000;
+}
+
+.load-more-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
-  .history-table {
-    th, td {
-      padding: 0.75rem 0.5rem;
-      font-size: 0.875rem;
-    }
-    
-    th:nth-child(2),
-    td:nth-child(2) {
-      display: none;
-    }
+  .item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .item-actions {
+    justify-content: flex-start;
+  }
+  
+  .history-stats {
+    justify-content: center;
   }
 }
 </style> 

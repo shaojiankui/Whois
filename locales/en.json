@@ -78,7 +78,9 @@
     "or": "OR",
     "registrationSuccess": "Registration successful! You can now log in.",
     "emailVerification": "Please verify your email address. A verification link has been sent to your email.",
-    "emailVerified": "Your email has been verified. You can now log in."
+    "emailVerified": "Your email has been verified. You can now log in.",
+    "loginRequired": "Login Required",
+    "adminRequired": "Admin Access Required"
   },
   "header": {
     "title": "Whois Lookup System",
@@ -548,5 +550,19 @@
   "changelog": {
     "title": "Changelog",
     "loading": "Loading changelog..."
+  },
+  "admin": {
+    "adminPanel": "Admin Panel",
+    "dashboard": "Dashboard",
+    "overview": "Overview",
+    "management": "Management",
+    "system": "System",
+    "userManagement": "User Management",
+    "tldManagement": "TLD Management",
+    "systemSettings": "System Settings",
+    "systemLogs": "System Logs",
+    "administrator": "Administrator",
+    "loginRequired": "Login Required",
+    "adminRequired": "Admin Access Required"
   }
 } 

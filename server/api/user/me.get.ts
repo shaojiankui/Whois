@@ -6,46 +6,30 @@ import { ResponseData } from '~/server/utils/response';
 
 export default createApiHandler(async (event) => {
   try {
-    // Get user ID from auth token
+    // 获取当前用户ID
     const userId = getUserFromEvent(event);
     if (!userId) {
-      throw createError({
-        statusCode: 401,
-        message: 'Unauthorized'
-      });
+      return ResponseData.error('未登录', 401);
     }
     
-    // Find user by ID
+    // 获取用户信息
     const user = await findUserById(userId);
     if (!user) {
-      throw createError({
-        statusCode: 404,
-        message: 'User not found'
-      });
+      return ResponseData.error('用户不存在', 404);
     }
     
-    // Return user data (without password)
-    return ResponseData.success({
+    // 返回用户信息（不包含敏感信息）
+    const userInfo = {
       id: user.id,
       username: user.username,
-      name: user.name,
       email: user.email,
-      reg_time: user.reg_time,
-      reg_ip: user.reg_ip,
-      last_ip: user.last_ip
-    });
-  } catch (error: any) {
-    if (error.statusCode) {
-      throw createError({
-        statusCode: error.statusCode,
-        message: error.message
-      });
-    }
+      name: user.username // 使用username作为name
+    };
     
-    console.error('Get user error:', error);
-    throw createError({
-      statusCode: 500,
-      message: 'Failed to get user data'
-    });
+    return ResponseData.success(userInfo, '获取用户信息成功');
+    
+  } catch (error: any) {
+    console.error('Get user info error:', error);
+    return ResponseData.error('获取用户信息失败', 500);
   }
 }); 
