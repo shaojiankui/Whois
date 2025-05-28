@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+**关键词触发规则**
+1. 当提示语中包含"d-po"时，请按照规则 [gen-po-model-repo.mdc](mdc:.cursor/rules/gen-po-model-repo.mdc) 执行。
+2. 当提示语中包含"r-flow"时，请按照代码提交阶段流程规范进行。

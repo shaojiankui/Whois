@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+请结合此次代码修改 @Branch (Diff with Main Branch)  和聊天记录, 总结生成开发此功能的 sop, 文档结构参考如下:
+```
+## 1. 用树形结构展示新增｜修改的文件
+
+## 2. 文件依赖关系图 (Mermaid)
+
+## 3. 注意事项（可能遇到的问题及解决方法）
+```

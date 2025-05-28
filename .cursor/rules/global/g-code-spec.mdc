@@ -1,0 +1,463 @@
+---
+description: 
+globs: .tsx,.vue
+alwaysApply: false
+---
+# Nuxt.js (Vue 3) 前端编码规范
+
+## 1. 引言
+
+### 1.1 目的
+
+本文档旨在为基于 Nuxt.js 3 和 Vue.js 3 的前端项目提供一套统一的编码规范和最佳实践。遵循此规范有助于提高代码质量、可读性、可维护性，并促进团队成员之间的有效协作。
+
+### 1.2 适用范围
+
+本规范适用于所有使用 Nuxt.js 3、Vue.js 3 (Composition API) 和 TypeScript 开发的新项目或正在进行重构的项目。
+
+## 2. 项目结构
+
+### 2.1 Nuxt 3 约定目录结构
+
+项目应遵循 Nuxt 3 的约定目录结构，以充分利用其自动导入和约定配置的特性。主要目录包括：
+
+- `pages/`: 存放页面组件，Nuxt 会根据此目录结构自动生成路由。
+- `components/`: 存放可复用组件。
+  - `components/global/`: 此目录下的组件会被自动注册为全局组件。
+  - 可以根据特性或功能创建子目录，例如 `components/ui/`, `components/product/`。
+- `layouts/`: 存放布局组件，用于定义不同页面的通用结构。
+- `composables/`: 存放 Vue Composition API 的组合式函数 (可复用逻辑)。
+- `server/`: 存放服务端代码。
+  - `server/api/`: API 路由。
+  - `server/routes/`: 服务端路由。
+  - `server/middleware/`: 服务端中间件。
+- `utils/`: 存放工具函数。
+- `store/`: 存放 Pinia 状态管理模块 (如果使用 Pinia)。Nuxt 推荐将 Pinia stores 直接放在 `composables/` 或 `store/` 目录下，文件名以 `.store.ts` 结尾，如 `user.store.ts`。
+- `assets/`: 存放需要通过构建工具处理的静态资源，如 CSS, SCSS, 图片等。
+- `public/`: 存放直接对外提供服务的静态资源，不会被构建工具处理，例如 `robots.txt`, `favicon.ico`。
+- `plugins/`: 存放 Vue 插件和 Nuxt 插件。
+- `middleware/`: 存放路由中间件。
+- `app.vue`: 应用的主组件，通常用于设置全局布局或提供者。
+- `nuxt.config.ts`: Nuxt 项目的配置文件。
+
+### 2.2 组件组织
+
+- 通用 UI 组件建议放在 `components/ui/` 或 `components/common/`。
+- 与特定特性相关的组件可以组织在对应的特性文件夹下，例如 `components/UserProfile/Avatar.vue`。
+
+## 3. 命名规范
+
+### 3.1 文件命名
+
+- **页面 (Pages)**: 使用 `kebab-case` (短横线连接)。例如: `user-profile.vue`, `product-details.vue`。
+  - 动态路由参数使用方括号，例如 `pages/users/[id].vue`。
+- **组件 (Components)**: 使用 `PascalCase` (大驼峰命名法)。例如: `UserProfileCard.vue`, `AppHeader.vue`。
+  - 组件文件名应清晰表达其功能。
+  - 如果组件是某个特定组件的子组件或高度相关，可以使用父组件名作为前缀，例如 `ListItem.vue` 和 `ListItemAvatar.vue`。
+- **布局 (Layouts)**: 使用 `kebab-case`。例如: `default-layout.vue`, `admin-layout.vue`。
+- **Composables (组合式函数)**: 使用 `camelCase`，并以 `use` 开头。例如: `useAuth.ts`, `useCounter.ts`。
+- **Store 模块 (Pinia)**: 使用 `kebab-case` 或 `camelCase` 加上 `.store` 后缀。例如: `user.store.ts` 或 `cartStore.ts`。
+- **工具函数 (Utils)**: 使用 `camelCase`。例如: `formatDate.ts`, `localStorageHelper.ts`。
+- **插件 (Plugins)**: 使用 `kebab-case`。例如: `my-plugin.client.ts` (客户端插件), `my-plugin.server.ts` (服务端插件), `my-plugin.ts` (通用插件)。
+- **中间件 (Middleware)**: 使用 `kebab-case`。例如: `auth.global.ts` (全局中间件), `auth.ts` (命名中间件)。
+- **Server API 路由**: 使用 `kebab-case`。例如: `hello.get.ts`, `user.post.ts`。
+
+### 3.2 变量与函数
+
+- **常量 (Constants)**: 使用 `UPPER_SNAKE_CASE` (全大写下划线连接)。例如: `const MAX_USERS = 100;`。
+- **响应式引用 (Refs & Reactives)**: 使用 `camelCase`。
+  - `ref`: `const count = ref(0);`
+  - `reactive`: `const userForm = reactive({ name: '', email: '' });`
+- **函数 (Functions)**: 使用 `camelCase`。例如: `function getUserData() { /* ... */ }`, `const calculatePrice = () => { /* ... */ };`。
+- **Props & Emits**:
+  - Prop 名称在 `<script setup>` 中使用 `camelCase`，在 `<template>` 中使用 `kebab-case`。
+  - Emit 事件名称使用 `camelCase`。对于 `v-model` 的更新事件，使用 `update:modelValue`。
+- **Pinia Store**:
+  - Store ID (第一个参数 `defineStore`): `camelCase`。例如 `defineStore('userProfile', /* ... */)`。
+  - State, Getters, Actions: `camelCase`。
+
+### 3.3 CSS 类名
+
+- 推荐使用 `kebab-case`。例如: `.user-profile-card {}`。
+- 也可以考虑使用 BEM (Block Element Modifier) 命名约定，例如: `.card__title--large {}`。
+- 如果使用了像 Tailwind CSS 这样的原子化 CSS 框架，则遵循其类名规范。
+
+## 4. 组件规范 (SFC - Single File Components)
+
+Vue 单文件组件 (`.vue` 文件) 应遵循以下结构顺序：
+
+```vue
+<script setup lang="ts">
+// 1. Imports (包括 defineProps, defineEmits, defineExpose 等宏)
+// 2. Props, Emits, Expose 定义
+// 3. Reactive state (ref, reactive, computed, etc.)
+// 4. Lifecycle hooks (onMounted, etc.)
+// 5. Watchers
+// 6. Helper functions / Event handlers
+</script>
+
+<template>
+  <!-- HTML 结构 -->
+</template>
+
+<style scoped>
+/* CSS 样式, 默认使用 scoped */
+</style>
+```
+
+### 4.1 `<script setup lang="ts">`
+
+- **优先使用**: 尽可能使用 `<script setup lang="ts">` 语法糖，它更简洁且性能更好。
+- **Imports**:
+  - Vue 和 Nuxt 的 API (如 `ref`, `computed`, `useFetch`) 通常是自动导入的，无需显式导入。
+  - 自定义组件和 Composable 函数也会被自动导入。
+  - 其他外部库或工具函数需要显式导入。
+- **Props**: 使用 `defineProps` 宏定义。
+
+    ```typescript
+    const props = defineProps<{
+      title: string;
+      items?: string[];
+      isActive: boolean;
+    }>();
+
+    // 或者带默认值和校验
+    const props = withDefaults(defineProps<{
+      message: string;
+      count?: number;
+    }>(), {
+      count: 0,
+    });
+    ```
+
+- **Emits**: 使用 `defineEmits` 宏定义。
+
+    ```typescript
+    const emit = defineEmits<{
+      (e: 'change', id: number): void;
+      (e: 'update:modelValue', value: string): void;
+    }>();
+
+    // 触发事件
+    emit('change', 123);
+    ```
+
+- **`defineExpose`**: 如果需要从父组件通过 `ref` 访问子组件的属性或方法，使用 `defineExpose`。
+- **响应式状态**:
+  - 使用 `ref` 定义基本类型或简单对象的响应式数据。
+  - 使用 `reactive` 定义复杂对象的响应式数据。
+  - 使用 `computed` 定义派生状态。
+- **逻辑分离**: 复杂的业务逻辑或可复用的功能应抽取到 `composables/` 目录下的组合式函数中。
+
+### 4.2 `<template>`
+
+- **简洁性**: 模板应保持简洁，主要负责结构展示。避免在模板中写入过多复杂逻辑，应将其移至 `<script setup>` 或 `composables`。
+- **指令使用**:
+  - `v-if` / `v-else-if` / `v-else`: 用于条件渲染。避免与 `v-for` 在同一元素上使用。
+  - `v-for`: 用于列表渲染。始终提供 `key` 属性，且 `key` 值应唯一且稳定。
+  - `v-bind` (简写 `:`): 用于动态绑定 HTML attribute。
+  - `v-on` (简写 `@`): 用于监听 DOM 事件。
+  - `v-model`: 用于双向数据绑定。
+- **组件标签**: 组件标签使用 `PascalCase` 或 `kebab-case` 均可，但推荐在模板中使用 `PascalCase` 以便与原生 HTML 标签区分，例如 `<UserProfileCard />`。
+- **可访问性**: 编写语义化的 HTML，使用正确的标签 (如 `<nav>`, `<article>`, `<button>`)。
+
+### 4.3 `<style scoped>`
+
+- **`scoped` 优先**: 默认情况下，组件样式应使用 `<style scoped>` 以避免全局样式污染。
+- **全局样式**: 全局样式应放在 `assets/css/main.css` (或 SCSS 文件) 中，并在 `nuxt.config.ts` 中引入，或者在根组件 `app.vue` 或布局文件中引入。
+- **CSS 变量**: 善用 CSS 自定义属性 (CSS Variables) 来实现主题化或动态样式。
+- **预处理器**: 如果使用 SCSS/LESS 等预处理器，请确保团队统一配置。
+
+## 5. Vue 3 & Nuxt 3 核心特性
+
+### 5.1 Composition API
+
+- **`ref` vs `reactive`**:
+  - `ref` 用于创建任何值的响应式引用，包括基本类型。返回一个包含 `.value` 属性的对象。
+  - `reactive` 只能用于对象类型 (包括数组和 Map、Set 这样的集合类型)。返回对象本身的一个响应式代理。
+  - 一般建议：简单值用 `ref`，复杂对象用 `reactive`。在模板中访问 `ref` 时会自动解包，无需 `.value`。
+- **`computed`**: 用于声明依赖其他响应式状态计算而来的数据。它是缓存的，只有当依赖变化时才会重新计算。
+- **`watch` 和 `watchEffect`**:
+  - `watch`: 精确监听一个或多个特定响应式数据源的变化，并在变化时执行回调。可以访问变化前后的值。
+  - `watchEffect`: 立即执行一个函数，并响应式地追踪其依赖。当依赖变化时重新运行该函数。
+  - 注意：避免过度使用 `watch`，可能会导致复杂的依赖关系和性能问题。优先考虑 `computed`。
+- **生命周期钩子**: 在 `<script setup>` 中，生命周期钩子函数以 `onX` 的形式导入和使用，例如 `onMounted`, `onUpdated`, `onUnmounted`。
+
+### 5.2 Nuxt 3 自动导入
+
+- Nuxt 3 会自动导入 `components/` 目录下的组件、`composables/` 目录下的函数以及 Vue 和 Nuxt 的核心 API。
+- 这减少了样板代码，但需要注意命名冲突的可能性。
+
+### 5.3 路由
+
+- **页面路由**: Nuxt 根据 `pages/` 目录结构自动生成路由。
+- **`<NuxtLink>`**: 用于内部导航，会自动处理活跃的类 (active class) 等。
+
+    ```html
+    <NuxtLink to="/about">关于我们</NuxtLink>
+    <NuxtLink :to="`/users/${userId}`">用户详情</NuxtLink>
+    ```
+
+- **编程式导航**:
+  - `navigateTo(to: string | RouteLocation, options?: NavigateToOptions)`: 用于在 `<script setup>` 或插件中进行导航。
+
+    ```typescript
+    import { navigateTo } from '#app'; // 通常自动导入
+
+    function goToProfile() {
+      navigateTo('/profile');
+    }
+    ```
+
+- **路由参数**: 使用 `useRoute()` 获取当前路由信息。
+
+    ```typescript
+    const route = useRoute();
+    const userId = computed(() => route.params.id);
+    ```
+
+- **路由元信息**: 可以在页面组件中通过 `definePageMeta` 定义。
+
+    ```typescript
+    // pages/admin.vue
+    definePageMeta({
+      layout: 'admin-layout',
+      middleware: ['auth']
+    });
+    ```
+
+### 5.4 数据获取
+
+Nuxt 3 提供了多种组合式函数用于数据获取：
+
+- **`useFetch(url, options?)`**:
+  - 在客户端和服务端均可执行。
+  - 自动处理 SSR 数据传输。
+  - 返回 `data`, `pending`, `error`, `refresh` 等。
+- **`useAsyncData(key, handler, options?)`**:
+  - 更通用的数据获取函数，`handler` 是一个返回 Promise 的异步函数。
+  - `key` 用于在服务端和客户端之间共享数据，必须唯一。
+- **`useLazyFetch(url, options?)` 和 `useLazyAsyncData(key, handler, options?)`**:
+  - 与上述类似，但不会阻塞客户端导航。数据在导航完成后异步加载。适合非关键数据。
+- **错误处理**: 务必检查返回的 `error` 对象并进行相应处理。
+
+```typescript
+// 使用 useFetch
+const { data: product, pending, error } = await useFetch(`/api/products/${productId.value}`);
+
+if (error.value) {
+  console.error('获取产品失败:', error.value);
+  // 可以使用 showError() 显示 Nuxt 错误页面
+  showError({ statusCode: 500, statusMessage: '获取产品失败' });
+}
+
+// 使用 useAsyncData
+const { data: user } = await useAsyncData('user-profile', () => $fetch('/api/user/profile'));
+```
+
+### 5.5 状态管理 (Pinia)
+
+Nuxt 3 集成了 Pinia 作为推荐的状态管理方案。
+
+- **定义 Store**: 在 `store/` 或 `composables/` 目录下创建 store 文件，例如 `user.store.ts`。
+
+    ```typescript
+    import { defineStore } from 'pinia';
+
+    export const useUserStore = defineStore('user', () => {
+      const name = ref('Anonymous');
+      const isLoggedIn = ref(false);
+
+      const fullName = computed(() => `${name.value} (User)`);
+
+      function login(username: string) {
+        name.value = username;
+        isLoggedIn.value = true;
+      }
+
+      function logout() {
+        name.value = 'Anonymous';
+        isLoggedIn.value = false;
+      }
+
+      return {
+        name,
+        isLoggedIn,
+        fullName,
+        login,
+        logout,
+      };
+    });
+    ```
+
+- **使用 Store**: 在组件或 Composable 中调用 store。
+
+    ```typescript
+    import { useUserStore } from '~/store/user.store'; // 或 '~/composables/user.store'
+
+    const userStore = useUserStore();
+    // userStore.name, userStore.login('Alice')
+    ```
+
+- **State**: 应通过函数返回初始状态，以确保 SSR 时状态不共享。Pinia 的 setup store 语法自动处理了这一点。
+- **Getters**: 相当于 store 的计算属性，使用 `computed` 定义。
+- **Actions**: 用于封装业务逻辑，可以是同步或异步的，用于修改 state。
+
+### 5.6 插件 (Plugins)
+
+- 插件用于在 Vue 应用初始化时执行代码，例如注册全局组件、指令，或集成第三方库。
+- 插件文件放在 `plugins/` 目录下，可以有 `.client.ts`, `.server.ts` 或 `.ts` 后缀来控制其执行环境。
+- 使用 `defineNuxtPlugin` 定义插件。
+
+### 5.7 中间件 (Middleware)
+
+- 路由中间件用于在导航到某个路由前执行代码，例如权限校验。
+- 中间件放在 `middleware/` 目录下。
+- 文件名可以是 `auth.ts` (命名中间件) 或 `auth.global.ts` (全局中间件)。
+- 使用 `defineNuxtRouteMiddleware` 定义。
+
+### 5.8 服务端能力 (`server/`)
+
+- Nuxt 3 提供了强大的服务端能力，可以直接在 `server/api/` 目录下创建 API 接口，或在 `server/routes/` 中定义更复杂的路由。
+- 使用 Nitro 引擎，性能高效。
+
+## 6. TypeScript 使用
+
+- **强类型**: 尽可能为所有变量、函数参数、返回值、Props、Emits、Store 状态等添加明确的 TypeScript 类型。
+- **Interfaces 和 Types**: 使用 `interface` 或 `type` 定义复杂数据结构。
+  - `interface` 适用于定义对象的形状，支持继承。
+  - `type` 更通用，可以用于定义联合类型、交叉类型、元组等。
+
+    ```typescript
+    interface User {
+      id: number;
+      name: string;
+      email?: string; // 可选属性
+    }
+
+    type Status = 'pending' | 'success' | 'error';
+    ```
+
+- **Props 类型**: 在 `defineProps` 中使用泛型或类型字面量。
+- **Emits 类型**: 在 `defineEmits` 中使用泛型。
+- **工具类型**: 善用 TypeScript 内置的工具类型，如 `Partial<T>`, `Readonly<T>`, `Pick<T, K>` 等。
+- **`tsconfig.json`**: Nuxt 项目会自动生成 `tsconfig.json`，通常无需过多修改，但应理解其配置项。
+
+## 7. 代码风格与格式化
+
+- **ESLint 和 Prettier**:
+  - 项目应配置 ESLint 进行代码规范检查，Prettier 进行代码格式化。
+  - Nuxt 3 项目通常在初始化时会包含推荐的 ESLint 和 Prettier 配置 (`@nuxtjs/eslint-config-typescript`)。
+  - 团队成员应统一使用相同的配置，并在提交代码前自动格式化。
+- **行长度**: 推荐每行代码不超过 100 或 120 个字符，以提高可读性。
+- **缩进**: 使用 2 个空格进行缩进。
+- **引号**: JavaScript/TypeScript 中推荐使用单引号 (`'`)，模板中 HTML 属性值使用双引号 (`"`).
+- **分号**: 根据 ESLint 配置决定是否使用分号 (通常推荐不使用或按需使用)。
+- **注释**:
+  - 对复杂的逻辑、算法或重要的业务规则进行注释。
+  - 使用 `// TODO:` 标记待办事项。
+  - 使用 `// FIXME:` 标记需要修复的问题。
+  - 函数和模块可以使用 JSDoc 风格的注释，尤其对于 Composable 和公共 API。
+- **空行**: 合理使用空行分隔逻辑块，提高代码可读性。
+
+## 8. 错误处理
+
+- **组件内部错误**: 使用 Vue 的 `onErrorCaptured` 生命周期钩子捕获子孙组件的错误。
+
+    ```typescript
+    import { onErrorCaptured } from 'vue';
+
+    onErrorCaptured((err, instance, info) => {
+      console.error('组件错误:', err, info);
+      // 返回 false 以阻止错误向上传播
+      return false; 
+    });
+    ```
+
+- **全局错误处理**:
+  - 创建一个 Nuxt 插件 (`plugins/error-handler.ts`) 来处理全局 Vue 错误。
+
+    ```typescript
+    // plugins/error-handler.ts
+    export default defineNuxtPlugin((nuxtApp) => {
+      nuxtApp.vueApp.config.errorHandler = (error, instance, info) => {
+        // 处理错误，例如上报到错误监控系统
+        console.error('全局 Vue 错误:', error, info);
+      };
+
+      // 针对 Nuxt 应用本身的错误 (如 useFetch 错误)
+      nuxtApp.hook('app:error', (error) => {
+        console.error('Nuxt App 错误:', error);
+      });
+
+      nuxtApp.hook('vue:error', (error) => {
+        console.error('Vue 错误 (通过 Nuxt Hook):', error);
+      });
+    });
+    ```
+
+- **Nuxt 错误页面 (`error.vue`)**: 在项目根目录创建 `error.vue` 文件来自定义全局错误展示页面。
+  - 使用 `showError(error: Error | { statusCode: number, statusMessage: string })` 函数触发错误页面。
+  - 在 `error.vue` 中可以通过 `useError()` 获取错误信息。
+- **API 请求错误**: 在使用 `useFetch` 或 `$fetch` 时，检查返回的 `error` 对象，并根据业务需求进行处理，例如提示用户或重试。
+
+## 9. 性能优化
+
+- **组件懒加载**:
+  - Nuxt 3 自动对页面进行代码分割。
+  - 对于非首屏必需的大型组件，可以使用 `defineAsyncComponent` 进行懒加载。
+  - Nuxt 3 的 `components/` 目录下的组件，如果只在特定条件下使用（例如 `v-if`），Nuxt 会智能地进行懒加载。
+- **图片优化**:
+  - 使用 `<NuxtImg>` 组件 (来自 `@nuxt/image`) 进行图片优化 (大小调整, 格式转换如 WebP, 懒加载)。
+  - 压缩图片资源。
+- **虚拟滚动 (Virtual Scrolling)**: 对于非常长的列表，使用虚拟滚动库 (如 `vue-virtual-scroller`) 来提高渲染性能。
+- **减少不必要的重渲染**:
+  - 合理使用 `computed` 属性，它们具有缓存特性。
+  - 对于计算开销大的纯展示组件，考虑使用 `v-memo` 指令。
+  - 避免在模板的绑定表达式中进行复杂计算。
+- **Tree Shaking**: Nuxt (Vite) 会自动进行 Tree Shaking，移除未使用的代码。确保代码模块化，以便 Tree Shaking 生效。
+- **Bundle 分析**: 使用 `nuxi analyse` (需要安装 `rollup-plugin-visualizer`) 分析打包产物，找出过大的模块进行优化。
+- **响应式数据优化**:
+  - 不要将所有数据都设为响应式，仅对需要在视图中更新或被 `watch`/`computed` 依赖的数据使用 `ref` 或 `reactive`。
+  - 对于大型只读数据，可以使用 `shallowRef` 或 `markRaw` 来避免深层响应式转换的开销。
+
+## 10. 可访问性 (a11y)
+
+- **语义化 HTML**: 使用正确的 HTML5 标签 (如 `<main>`, `<nav>`, `<aside>`, `<article>`, `<section>`, `<button>`) 来构建页面结构。
+- **图片 `alt` 属性**: 所有 `<img>` 标签必须提供有意义的 `alt` 属性，用于描述图片内容。如果图片纯粹是装饰性的，`alt` 可以为空 (`alt=""`)。
+- **表单标签**: 所有表单输入控件 (`<input>`, `<textarea>`, `<select>`) 都应有关联的 `<label>`。
+- **键盘导航**: 确保所有交互元素 (链接、按钮、表单控件) 都可以通过键盘 (Tab 键) 访问和操作。
+- **焦点管理**: 适当管理焦点状态，尤其是在模态框、下拉菜单等动态 UI 中。
+- **ARIA 属性**: 在必要时使用 ARIA (Accessible Rich Internet Applications) 属性来增强非标准 UI 组件的可访问性 (例如，`role`, `aria-label`, `aria-hidden`)。
+- **颜色对比度**: 确保文本和背景有足够的颜色对比度，符合 WCAG AA 级别标准。
+- **测试**: 使用可访问性检查工具 (如 Axe DevTools 浏览器扩展) 和屏幕阅读器进行测试。
+
+## 11. 测试
+
+- **单元测试 (Unit Tests)**:
+  - 使用 Vitest (Vite 原生测试框架，与 Nuxt 3 配合良好) 进行单元测试。
+  - 测试 Composable 函数、工具函数、Store 逻辑等。
+  - 力求高覆盖率，尤其是核心逻辑。
+- **组件测试 (Component Tests)**:
+  - 使用 `@vue/test-utils` 配合 Vitest 进行组件测试。
+  - 测试组件的渲染输出、Props、Emits、Slots 以及用户交互。
+- **端到端测试 (E2E Tests)**:
+  - 使用 Playwright 或 Cypress 等框架进行端到端测试。
+  - 测试关键用户流程。
+  - Nuxt 官方提供了 `@nuxt/test-utils` 辅助 E2E 测试。
+- **测试命名**: 测试文件名通常与被测试文件同名，并加上 `.spec.ts` 或 `.test.ts` 后缀 (例如 `useCounter.spec.ts`)。
+- **测试覆盖率**: 关注核心功能的测试覆盖率，并逐步提高。
+
+## 12. 最佳实践与原则
+
+- **代码可读性**: 编写清晰、易于理解的代码。使用有意义的变量名和函数名。
+- **单一职责原则 (SRP)**: 组件和函数应尽可能只做一件事。
+- **DRY (Don't Repeat Yourself)**: 避免重复代码，将可复用逻辑提取到函数或 Composable 中。
+- **KISS (Keep It Simple, Stupid)**: 保持解决方案简单直接，避免过度工程化。
+- **代码审查 (Code Review)**: 定期进行代码审查，以确保规范的执行和知识共享。
+- **持续学习**: Vue 和 Nuxt 生态系统发展迅速，保持学习新特性和最佳实践。
+- **利用 Nuxt Devtools**: Nuxt Devtools 提供了强大的调试和分析功能，善用它可以提高开发效率。
+
+---
+
+本文档将根据项目实践和技术发展持续更新。

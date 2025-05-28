@@ -163,7 +163,7 @@
 
 #### 3. TLD存储
 
-- `tld.json` 
+- `tld数据表` 
 - TLD -> whois server / keyword pattern / 分组
 
 

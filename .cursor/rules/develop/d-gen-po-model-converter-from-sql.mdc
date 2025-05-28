@@ -1,0 +1,5 @@
+---
+description: 根据sql生成model和po文件，以及converter转化器
+globs: 
+alwaysApply: false
+---
