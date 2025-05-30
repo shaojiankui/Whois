@@ -259,16 +259,18 @@ async function handleLogout() {
 }
 
 .sidebar-header {
-  padding: 0.75rem 1rem;
+  padding: 1rem;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 60px;
+  height: 72px; /* 固定高度，包含border */
+  box-sizing: border-box;
 }
 
 .logo-section {
   flex: 1;
+  min-width: 0; /* 防止flex item溢出 */
 }
 
 .logo-link {
@@ -286,12 +288,16 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .logo-text {
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--primary-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar-toggle {
@@ -306,6 +312,7 @@ async function handleLogout() {
   cursor: pointer;
   transition: all 0.3s ease;
   color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
 .sidebar-toggle:hover {
@@ -538,11 +545,12 @@ async function handleLogout() {
 .admin-header {
   background-color: var(--card-bg);
   border-bottom: 1px solid var(--border-color);
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 60px;
+  height: 72px; /* 固定高度，与sidebar-header相同 */
+  box-sizing: border-box;
   position: sticky;
   top: 0;
   z-index: 90;

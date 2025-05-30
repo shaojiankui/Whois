@@ -642,5 +642,80 @@
     "administrator": "管理员",
     "loginRequired": "需要登录",
     "adminRequired": "需要管理员权限"
+  },
+  "settings": {
+    "title": "系统设置",
+    "basic": "基本配置",
+    "email": "邮件服务",
+    "cache": "缓存配置", 
+    "security": "安全设置",
+    "rateLimit": "API限流",
+    "backup": "备份恢复",
+    "save": "保存设置",
+    "saving": "保存中...",
+    "saveSuccess": "设置保存成功",
+    "saveFailed": "设置保存失败",
+    "loadFailed": "加载配置失败",
+    
+    "basic": {
+      "siteName": "网站名称",
+      "siteDescription": "网站描述",
+      "siteUrl": "网站URL",
+      "adminEmail": "管理员邮箱",
+      "maintenanceMode": "维护模式",
+      "maintenanceDescription": "启用后网站将显示维护页面",
+      "maxUploadSize": "最大上传文件大小 (MB)",
+      "timezone": "系统时区",
+      "defaultLanguage": "默认语言"
+    },
+    
+    "email": {
+      "smtpHost": "SMTP服务器地址",
+      "smtpPort": "SMTP端口",
+      "smtpSecure": "使用SSL/TLS加密",
+      "smtpUser": "SMTP用户名",
+      "smtpPassword": "SMTP密码",
+      "smtpPasswordPlaceholder": "留空表示不修改",
+      "fromEmail": "发件人邮箱",
+      "fromName": "发件人名称"
+    },
+    
+    "cache": {
+      "redisHost": "Redis服务器地址",
+      "redisPort": "Redis端口",
+      "redisPassword": "Redis密码",
+      "redisPasswordPlaceholder": "留空表示无密码",
+      "redisDb": "Redis数据库编号",
+      "defaultTtl": "默认缓存时间 (秒)",
+      "maxMemory": "最大内存使用量",
+      "maxMemoryDescription": "支持单位: kb, mb, gb"
+    },
+    
+    "security": {
+      "jwtExpiresIn": "JWT过期时间",
+      "passwordMinLength": "密码最小长度",
+      "passwordRequireSpecial": "密码需要特殊字符",
+      "maxLoginAttempts": "最大登录尝试次数",
+      "lockoutDuration": "账户锁定时间 (秒)"
+    },
+    
+    "rateLimit": {
+      "enabled": "启用API限流",
+      "whoisRequestsPerMinute": "每分钟WHOIS查询限制",
+      "bulkRequestsPerHour": "每小时批量查询限制",
+      "apiRequestsPerMinute": "每分钟API请求限制"
+    },
+    
+    "backup": {
+      "autoBackupEnabled": "启用自动备份",
+      "backupInterval": "备份间隔 (小时)",
+      "backupRetentionDays": "备份保留天数",
+      "backupLocation": "备份存储位置",
+      "compressBackups": "压缩备份文件",
+      "createBackup": "立即创建备份",
+      "creatingBackup": "创建中...",
+      "backupSuccess": "备份创建成功",
+      "backupFailed": "创建备份失败"
+    }
   }
 }
