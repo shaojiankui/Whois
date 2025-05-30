@@ -1387,7 +1387,7 @@ function maskIP(ip: string | undefined): string {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
   background-color: var(--card-bg);
@@ -1398,17 +1398,17 @@ function maskIP(ip: string | undefined): string {
 .modal-header h3 {
   margin: 0;
   color: var(--text-color);
-  font-size: 1.25rem;
+  font-size: 1.1rem;
 }
 
 .modal-close {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   cursor: pointer;
   color: var(--text-color-light);
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1422,103 +1422,115 @@ function maskIP(ip: string | undefined): string {
 }
 
 .modal-body {
-  padding: 2rem;
+  padding: 1.5rem;
   overflow-y: auto;
   flex: 1;
 }
 
-/* 日志详情 - 紧凑布局 */
+/* 日志详情 - 超紧凑布局 */
 .log-details-compact {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .detail-grid-compact {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem 2rem;
-  padding: 1.5rem;
+  gap: 0.75rem 1.5rem;
+  padding: 1rem;
   background: var(--bg-secondary);
-  border-radius: 6px;
+  border-radius: 4px;
   border: 1px solid var(--border-color);
 }
 
 .detail-item-compact {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 .detail-item-compact .label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-color-light);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
+  margin-bottom: 0;
 }
 
 .detail-item-compact .value {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-color);
   font-weight: 500;
+  line-height: 1.2;
 }
 
 .section-title {
-  margin: 0 0 1rem 0;
-  font-size: 0.9rem;
+  margin: 0 0 0.5rem 0;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-color);
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
   border-bottom: 1px solid var(--border-color);
 }
 
 .message-content-compact {
-  padding: 1.2rem;
+  padding: 0.75rem;
   background: var(--bg-secondary);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-color);
-  line-height: 1.6;
+  line-height: 1.4;
   white-space: pre-wrap;
-  border-radius: 6px;
+  border-radius: 4px;
   border: 1px solid var(--border-color);
+  margin: 0;
 }
 
 .json-content-compact {
-  padding: 1.2rem;
+  padding: 0.75rem;
   background: #1e293b;
   color: #e2e8f0;
   font-family: monospace;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   overflow-x: auto;
-  border-radius: 6px;
+  border-radius: 4px;
   border: 1px solid #475569;
+  margin: 0;
 }
 
 .json-content-compact pre {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
-  line-height: 1.5;
+  line-height: 1.3;
 }
 
 .user-agent-content-compact {
-  padding: 1.2rem;
+  padding: 0.75rem;
   background: var(--bg-secondary);
   font-family: monospace;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-color);
-  line-height: 1.5;
+  line-height: 1.3;
   word-break: break-all;
-  border-radius: 6px;
+  border-radius: 4px;
   border: 1px solid var(--border-color);
+  margin: 0;
 }
 
 .message-section,
 .error-section,
 .request-section,
 .user-agent-section {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.message-section:last-child,
+.error-section:last-child,
+.request-section:last-child,
+.user-agent-section:last-child {
+  margin-bottom: 0;
 }
 
 /* 认证状态 */
