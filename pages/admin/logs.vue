@@ -255,70 +255,71 @@
         </div>
 
         <div class="modal-body" v-if="selectedLog">
-          <div class="log-details">
-            <div class="detail-section">
-              <h4>基本信息</h4>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <span class="label">日志ID：</span>
-                  <span class="value">{{ selectedLog.id }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="label">级别：</span>
-                  <span class="value">
-                    <span :class="`level-badge ${selectedLog.log_level}`">
-                      {{ getLevelText(selectedLog.log_level) }}
-                    </span>
+          <div class="log-details-compact">
+            <!-- 基本信息 - 2行2列布局 -->
+            <div class="detail-grid-compact">
+              <div class="detail-item-compact">
+                <span class="label">日志ID：</span>
+                <span class="value">{{ selectedLog.id }}</span>
+              </div>
+              <div class="detail-item-compact">
+                <span class="label">级别：</span>
+                <span class="value">
+                  <span :class="`level-badge ${selectedLog.log_level}`">
+                    {{ getLevelText(selectedLog.log_level) }}
                   </span>
-                </div>
-                <div class="detail-item">
-                  <span class="label">类型：</span>
-                  <span class="value">{{ getTypeText(selectedLog.log_type) }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="label">后缀：</span>
-                  <span class="value">{{ selectedLog.tld || 'N/A' }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="label">执行时间：</span>
-                  <span class="value">{{ selectedLog.execution_time ? selectedLog.execution_time + 'ms' : 'N/A'
-                    }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="label">用户IP：</span>
-                  <span class="value">{{ selectedLog.user_ip || 'N/A' }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="label">创建时间：</span>
-                  <span class="value">{{ formatDateTime(selectedLog.created_at) }}</span>
-                </div>
+                </span>
+              </div>
+              <div class="detail-item-compact">
+                <span class="label">类型：</span>
+                <span class="value">{{ getTypeText(selectedLog.log_type) }}</span>
+              </div>
+              <div class="detail-item-compact">
+                <span class="label">后缀：</span>
+                <span class="value">{{ selectedLog.tld || 'N/A' }}</span>
+              </div>
+              <div class="detail-item-compact">
+                <span class="label">执行时间：</span>
+                <span class="value">{{ selectedLog.execution_time ? selectedLog.execution_time + 'ms' : 'N/A' }}</span>
+              </div>
+              <div class="detail-item-compact">
+                <span class="label">用户IP：</span>
+                <span class="value">{{ selectedLog.user_ip || 'N/A' }}</span>
+              </div>
+              <div class="detail-item-compact">
+                <span class="label">创建时间：</span>
+                <span class="value">{{ formatDateTime(selectedLog.created_at) }}</span>
               </div>
             </div>
 
-            <div class="detail-section">
-              <h4>消息内容</h4>
-              <div class="message-content">
+            <!-- 消息内容 -->
+            <div class="message-section">
+              <h4 class="section-title">消息内容</h4>
+              <div class="message-content-compact">
                 {{ selectedLog.message }}
               </div>
             </div>
 
-            <div v-if="selectedLog.error_details" class="detail-section">
-              <h4>错误详情</h4>
-              <div class="json-content">
+            <!-- 错误详情 -->
+            <div v-if="selectedLog.error_details" class="error-section">
+              <h4 class="section-title">错误详情</h4>
+              <div class="json-content-compact">
                 <pre>{{ JSON.stringify(selectedLog.error_details, null, 2) }}</pre>
               </div>
             </div>
 
-            <div v-if="selectedLog.request_data" class="detail-section">
-              <h4>请求数据</h4>
-              <div class="json-content">
+            <!-- 请求数据 -->
+            <div v-if="selectedLog.request_data" class="request-section">
+              <h4 class="section-title">请求数据</h4>
+              <div class="json-content-compact">
                 <pre>{{ JSON.stringify(selectedLog.request_data, null, 2) }}</pre>
               </div>
             </div>
 
-            <div v-if="selectedLog.user_agent" class="detail-section">
-              <h4>用户代理</h4>
-              <div class="user-agent-content">
+            <!-- 用户代理 -->
+            <div v-if="selectedLog.user_agent" class="user-agent-section">
+              <h4 class="section-title">用户代理</h4>
+              <div class="user-agent-content-compact">
                 {{ selectedLog.user_agent }}
               </div>
             </div>
@@ -1038,47 +1039,43 @@ function maskIP(ip: string | undefined): string {
 
 /* 表格列宽 */
 .col-level {
-  width: 8%;
-  min-width: 70px;
+  width: 6%;
+  min-width: 60px;
 }
 
 .col-type {
-  width: 12%;
-  min-width: 100px;
+  width: 8%;
+  min-width: 80px;
 }
 
 .col-message {
-  width: 35%;
+  width: 30%;
   min-width: 200px;
 }
 
 .col-domain {
-  width: 15%;
-  min-width: 120px;
+  width: 8%;
+  min-width: 60px;
 }
 
 .col-time {
-  width: 10%;
+  width: 8%;
   min-width: 80px;
-  text-align: center;
 }
 
 .col-ip {
   width: 10%;
-  min-width: 90px;
-  text-align: center;
+  min-width: 100px;
 }
 
 .col-created {
-  width: 12%;
-  min-width: 100px;
-  text-align: center;
+  width: 18%;
+  min-width: 140px;
 }
 
 .col-actions {
-  width: 8%;
-  min-width: 70px;
-  text-align: center;
+  width: 6%;
+  min-width: 60px;
 }
 
 /* 级别徽章 */
@@ -1430,44 +1427,30 @@ function maskIP(ip: string | undefined): string {
   flex: 1;
 }
 
-/* 日志详情 */
-.log-details {
+/* 日志详情 - 紧凑布局 */
+.log-details-compact {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.detail-section {
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--card-bg);
-}
-
-.detail-section h4 {
-  margin: 0;
-  padding: 1rem 1.5rem;
-  background: var(--bg-secondary);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-color);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.detail-grid {
-  padding: 1.5rem;
+.detail-grid-compact {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 2rem;
+  padding: 1.5rem;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
 }
 
-.detail-item {
+.detail-item-compact {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.detail-item .label {
+.detail-item-compact .label {
   font-size: 0.75rem;
   color: var(--text-color-light);
   font-weight: 600;
@@ -1475,54 +1458,67 @@ function maskIP(ip: string | undefined): string {
   letter-spacing: 0.1em;
 }
 
-.detail-item .value {
+.detail-item-compact .value {
   font-size: 0.9rem;
   color: var(--text-color);
   font-weight: 500;
 }
 
-.message-content {
-  padding: 1.5rem;
+.section-title {
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.message-content-compact {
+  padding: 1.2rem;
   background: var(--bg-secondary);
   font-size: 0.9rem;
   color: var(--text-color);
-  line-height: 1.7;
+  line-height: 1.6;
   white-space: pre-wrap;
   border-radius: 6px;
-  margin: 1rem 1.5rem;
   border: 1px solid var(--border-color);
 }
 
-.json-content {
-  padding: 1.5rem;
+.json-content-compact {
+  padding: 1.2rem;
   background: #1e293b;
   color: #e2e8f0;
   font-family: monospace;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   overflow-x: auto;
   border-radius: 6px;
-  margin: 1rem 1.5rem;
   border: 1px solid #475569;
 }
 
-.json-content pre {
+.json-content-compact pre {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
-.user-agent-content {
-  padding: 1.5rem;
+.user-agent-content-compact {
+  padding: 1.2rem;
   background: var(--bg-secondary);
   font-family: monospace;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-color);
-  line-height: 1.6;
+  line-height: 1.5;
   word-break: break-all;
   border-radius: 6px;
-  margin: 1rem 1.5rem;
   border: 1px solid var(--border-color);
+}
+
+.message-section,
+.error-section,
+.request-section,
+.user-agent-section {
+  margin-bottom: 1rem;
 }
 
 /* 认证状态 */
@@ -1710,15 +1706,15 @@ function maskIP(ip: string | undefined): string {
     padding: 1rem;
   }
 
-  .detail-grid {
+  .detail-grid-compact {
     grid-template-columns: 1fr;
     padding: 1rem;
     gap: 1rem;
   }
 
-  .message-content,
-  .json-content,
-  .user-agent-content {
+  .message-content-compact,
+  .json-content-compact,
+  .user-agent-content-compact {
     margin: 0;
     padding: 1rem;
     font-size: 0.8rem;
@@ -1819,16 +1815,11 @@ function maskIP(ip: string | undefined): string {
     font-size: 1rem;
   }
 
-  .detail-section h4 {
-    padding: 0.75rem 1rem;
-    font-size: 0.8rem;
-  }
-
-  .detail-item .label {
+  .detail-item-compact .label {
     font-size: 0.65rem;
   }
 
-  .detail-item .value {
+  .detail-item-compact .value {
     font-size: 0.8rem;
   }
 
