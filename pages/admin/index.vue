@@ -19,7 +19,6 @@
       <!-- 统计面板 -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-icon">👥</div>
           <div class="stat-content">
             <div class="stat-number">{{ stats.totalUsers }}</div>
             <div class="stat-label">总用户数</div>
@@ -28,7 +27,6 @@
         </div>
         
         <div class="stat-card">
-          <div class="stat-icon">🌍</div>
           <div class="stat-content">
             <div class="stat-number">{{ stats.supportedTlds }}</div>
             <div class="stat-label">支持的TLD</div>
@@ -37,7 +35,6 @@
         </div>
         
         <div class="stat-card">
-          <div class="stat-icon">🔍</div>
           <div class="stat-content">
             <div class="stat-number">{{ stats.totalQueries }}</div>
             <div class="stat-label">总查询次数</div>
@@ -46,7 +43,6 @@
         </div>
         
         <div class="stat-card">
-          <div class="stat-icon">📈</div>
           <div class="stat-content">
             <div class="stat-number">{{ stats.avgResponseTime }}ms</div>
             <div class="stat-label">平均响应时间</div>
@@ -228,7 +224,7 @@ onMounted(() => {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 1rem;
   display: flex;
   align-items: center;
   box-shadow: var(--card-shadow);
@@ -237,11 +233,6 @@ onMounted(() => {
 
 .stat-card:hover {
   transform: translateY(-2px);
-}
-
-.stat-icon {
-  font-size: 3rem;
-  margin-right: 1rem;
 }
 
 .stat-content {

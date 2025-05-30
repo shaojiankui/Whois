@@ -240,7 +240,7 @@ async function handleLogout() {
 
 /* 侧边栏样式 */
 .admin-sidebar {
-  width: 280px;
+  width: 240px;
   background-color: var(--card-bg);
   border-right: 1px solid var(--border-color);
   display: flex;
@@ -255,16 +255,16 @@ async function handleLogout() {
 }
 
 .sidebar-collapsed {
-  width: 80px;
+  width: 60px;
 }
 
 .sidebar-header {
-  padding: 1.5rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 80px;
+  min-height: 60px;
 }
 
 .logo-section {
@@ -321,16 +321,16 @@ async function handleLogout() {
 /* 导航样式 */
 .sidebar-nav {
   flex: 1;
-  padding: 1rem 0;
+  padding: 0.75rem 0;
   overflow-y: auto;
 }
 
 .nav-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .nav-title {
-  padding: 0 1.5rem;
+  padding: 0 1rem;
   margin-bottom: 0.5rem;
   font-size: 0.75rem;
   font-weight: 600;
@@ -353,7 +353,7 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.625rem 1rem;
   text-decoration: none;
   color: var(--text-color);
   transition: all 0.3s ease;
@@ -398,11 +398,20 @@ async function handleLogout() {
   margin-top: auto;
 }
 
+.sidebar-collapsed .sidebar-footer {
+  padding: 1rem 0.5rem;
+}
+
 .admin-user-info {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1rem;
+}
+
+.sidebar-collapsed .admin-user-info {
+  justify-content: center;
+  margin-bottom: 0.75rem;
 }
 
 .user-avatar {
@@ -416,10 +425,19 @@ async function handleLogout() {
   flex-shrink: 0;
 }
 
+.sidebar-collapsed .user-avatar {
+  width: 32px;
+  height: 32px;
+}
+
 .avatar-text {
   color: white;
   font-weight: 600;
   font-size: 1rem;
+}
+
+.sidebar-collapsed .avatar-text {
+  font-size: 0.9rem;
 }
 
 .user-details {
@@ -445,6 +463,12 @@ async function handleLogout() {
   gap: 0.5rem;
 }
 
+.sidebar-collapsed .footer-actions {
+  flex-direction: column;
+  gap: 0.375rem;
+  align-items: center;
+}
+
 .action-btn {
   display: flex;
   align-items: center;
@@ -460,39 +484,65 @@ async function handleLogout() {
   flex: 1;
   justify-content: center;
   font-size: 0.85rem;
+  min-height: 36px;
+}
+
+.sidebar-collapsed .action-btn {
+  padding: 0.5rem;
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  justify-content: center;
+  gap: 0;
+  border-radius: 8px;
+}
+
+.sidebar-collapsed .action-btn .action-text {
+  display: none;
 }
 
 .action-btn:hover {
   background-color: var(--bg-secondary);
   border-color: var(--primary-color);
   color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-collapsed .action-btn:hover {
+  transform: scale(1.05);
 }
 
 .action-icon {
   font-size: 1rem;
 }
 
+.sidebar-collapsed .action-icon {
+  font-size: 1.1rem;
+}
+
 /* 主内容区域 */
 .admin-main {
   flex: 1;
-  margin-left: 280px;
+  margin-left: 240px;
   display: flex;
   flex-direction: column;
   transition: margin-left 0.3s ease;
 }
 
 .main-expanded {
-  margin-left: 80px;
+  margin-left: 60px;
 }
 
 .admin-header {
   background-color: var(--card-bg);
   border-bottom: 1px solid var(--border-color);
-  padding: 1rem 2rem;
+  padding: 0.75rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 80px;
+  min-height: 60px;
   position: sticky;
   top: 0;
   z-index: 90;
@@ -579,7 +629,7 @@ async function handleLogout() {
 @media (max-width: 768px) {
   .admin-sidebar {
     transform: translateX(-100%);
-    width: 280px;
+    width: 240px;
   }
   
   .admin-sidebar.sidebar-open {

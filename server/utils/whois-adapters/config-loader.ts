@@ -82,6 +82,7 @@ function getDefaultConfig(configName: string): any {
         "expired_date": [
           { "value": "expiration date" },
           { "value": "expire date" },
+          { "value": "expiry date" },
           { "value": "renewal date" },
           { "value": "expires on" },
           { "value": "registry expiry date" }

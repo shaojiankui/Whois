@@ -1,6 +1,6 @@
 {
   "common": {
-    "title": "Whois查询工具",
+    "title": "Whois",
     "description": "强大的域名Whois信息查询工具",
     "search": "搜索",
     "submit": "提交",
@@ -80,7 +80,7 @@
     "completed": "已完成",
     "failed": "失败",
     "unknown": "未知",
-    "backToSite": "返回网站",
+    "backToSite": "返回",
     "toggleTheme": "切换主题",
     "welcome": "欢迎使用Whois查询系统",
     "noData": "暂无数据",
@@ -94,7 +94,7 @@
     "removeFromFavorites": "从收藏中移除",
     "login": "登录",
     "register": "注册",
-    "logout": "退出登录",
+    "logout": "退出",
     "profile": "个人中心",
     "navigation": "导航",
     "yes": "是",

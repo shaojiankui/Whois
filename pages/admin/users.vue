@@ -18,51 +18,36 @@
     
     <div v-else class="users-container">
       <!-- 统计区域 -->
-      <div class="stats-section">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">👥</div>
-            <div class="stat-info">
-              <div class="stat-number">{{ users.length }}</div>
-              <div class="stat-label">总用户数</div>
-            </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-number">{{ users.length }}</div>
+            <div class="stat-label">总用户数</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-info">
-              <div class="stat-number">{{ getTodayRegistrations() }}</div>
-              <div class="stat-label">今日注册</div>
-            </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-number">{{ getTodayRegistrations() }}</div>
+            <div class="stat-label">今日注册</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon">📊</div>
-            <div class="stat-info">
-              <div class="stat-number">{{ getThisMonthRegistrations() }}</div>
-              <div class="stat-label">本月注册</div>
-            </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-number">{{ getThisMonthRegistrations() }}</div>
+            <div class="stat-label">本月注册</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon">🔄</div>
-            <div class="stat-info">
-              <div class="stat-number">{{ getActiveUsers() }}</div>
-              <div class="stat-label">活跃用户</div>
-            </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-number">{{ getActiveUsers() }}</div>
+            <div class="stat-label">活跃用户</div>
           </div>
         </div>
       </div>
       
       <!-- 操作和搜索区域 -->
       <div class="search-section">
-        <div class="section-header">
-          <h3 class="section-title">用户管理</h3>
-          <div class="section-actions">
-            <button @click="refreshUsers" class="btn-refresh" :disabled="loading">
-              <span class="btn-icon">🔄</span>
-              {{ loading ? '刷新中...' : '刷新' }}
-            </button>
-          </div>
-        </div>
-        <div class="search-controls">
+        <div class="search-controls-inline">
           <div class="search-input-group">
             <div class="search-icon">🔍</div>
             <input 
@@ -74,12 +59,24 @@
             >
             <button v-if="searchQuery" @click="clearSearch" class="clear-search">✕</button>
           </div>
-          <div class="search-filters">
+          
+          <div class="filter-group">
             <select v-model="userFilter" @change="handleFilterChange" class="filter-select">
               <option value="all">所有用户</option>
               <option value="recent">最近注册</option>
               <option value="active">活跃用户</option>
             </select>
+          </div>
+          
+          <div class="action-buttons-inline">
+            <button @click="handleSearch" class="btn-search">
+              <span class="btn-icon">🔍</span>
+              搜索
+            </button>
+            <button @click="resetFilters" class="btn-reset">
+              <span class="btn-icon">🔄</span>
+              重置
+            </button>
           </div>
         </div>
       </div>
@@ -96,87 +93,59 @@
       </div>
       
       <!-- 用户列表区域 -->
-      <div class="list-section">
-        <div class="list-header">
-          <div class="list-title">
-            <span>用户列表</span>
-            <span class="list-count">({{ filteredUsers.length }} 个用户)</span>
-          </div>
-          <div class="list-actions">
-            <select v-model="pageSize" @change="handlePageSizeChange" class="page-size-select">
-              <option value="10">10条/页</option>
-              <option value="25">25条/页</option>
-              <option value="50">50条/页</option>
-              <option value="100">100条/页</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="users-table-container">
-          <table class="users-table">
-            <thead>
-              <tr>
-                <th class="col-id">ID</th>
-                <th class="col-user">用户信息</th>
-                <th class="col-time">注册时间</th>
-                <th class="col-activity">活动信息</th>
-                <th class="col-actions">操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="user in paginatedUsers" :key="user.id" class="user-row">
-                <td class="user-id">
-                  <span class="id-badge">#{{ user.id }}</span>
-                </td>
-                <td class="user-info">
-                  <div class="user-avatar">
-                    <span class="avatar-text">{{ user.username.charAt(0).toUpperCase() }}</span>
-                  </div>
-                  <div class="user-details">
-                    <div class="username">{{ user.username }}</div>
-                    <div class="email">{{ user.email }}</div>
-                    <div v-if="user.name" class="name">{{ user.name }}</div>
-                  </div>
-                </td>
-                <td class="reg-time">
-                  <div class="time-info">
-                    <div class="date">{{ formatDateShort(user.reg_time) }}</div>
-                    <div class="time">{{ formatTimeShort(user.reg_time) }}</div>
-                  </div>
-                </td>
-                <td class="activity-info">
-                  <div class="activity-item">
-                    <span class="activity-label">查询次数:</span>
-                    <span class="activity-value">{{ user.query_count || 0 }}</span>
-                  </div>
-                  <div class="activity-item">
-                    <span class="activity-label">最后IP:</span>
-                    <span class="activity-value">{{ maskIP(user.last_ip) }}</span>
-                  </div>
-                </td>
-                <td class="actions">
-                  <div class="action-buttons">
-                    <button @click="viewUser(user)" class="btn-action btn-view" title="查看详情">
-                      <span class="btn-icon">👁️</span>
-                    </button>
-                    <button @click="editUser(user)" class="btn-action btn-edit" title="编辑用户">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button @click="deleteUser(user)" class="btn-action btn-delete" title="删除用户">
-                      <span class="btn-icon">🗑️</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          
-          <div v-if="filteredUsers.length === 0" class="empty-state">
-            <div class="empty-icon">👤</div>
-            <div class="empty-title">{{ searchQuery ? '没有找到匹配的用户' : '暂无用户数据' }}</div>
-            <div class="empty-desc">{{ searchQuery ? '尝试调整搜索条件' : '等待用户注册' }}</div>
-          </div>
-        </div>
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th class="col-user">用户信息</th>
+            <th class="col-time">注册时间</th>
+            <th class="col-activity">活动信息</th>
+            <th class="col-actions">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user in paginatedUsers" :key="user.id" class="user-row">
+            <td class="user-info">
+              <div class="user-details">
+                <span class="username">{{ user.username }}</span>
+                <span class="user-separator">|</span>
+                <span class="email">{{ user.email }}</span>
+              </div>
+            </td>
+            <td class="reg-time">
+              <div class="time-info">
+                <span class="datetime">{{ formatDateShort(user.reg_time) }} {{ formatTimeShort(user.reg_time) }}</span>
+              </div>
+            </td>
+            <td class="activity-info">
+              <div class="activity-compact">
+                <span class="activity-separator">|</span>
+                <span class="activity-item">
+                  <span class="activity-label">IP:</span>
+                  <span class="activity-value">{{ maskIP(user.last_ip) }}</span>
+                </span>
+              </div>
+            </td>
+            <td class="actions">
+              <div class="action-buttons">
+                <button @click="viewUser(user)" class="btn-action btn-view" title="查看详情">
+                  <span class="btn-icon">👁️</span>
+                </button>
+                <button @click="editUser(user)" class="btn-action btn-edit" title="编辑用户">
+                  <span class="btn-icon">✏️</span>
+                </button>
+                <button @click="deleteUser(user)" class="btn-action btn-delete" title="删除用户">
+                  <span class="btn-icon">🗑️</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div v-if="filteredUsers.length === 0" class="empty-state">
+        <div class="empty-icon">👤</div>
+        <div class="empty-title">{{ searchQuery ? '没有找到匹配的用户' : '暂无用户数据' }}</div>
+        <div class="empty-desc">{{ searchQuery ? '尝试调整搜索条件' : '等待用户注册' }}</div>
       </div>
       
       <!-- 分页区域 -->
@@ -269,7 +238,7 @@
           <button @click="closeModals" class="modal-close">×</button>
         </div>
         
-        <div class="user-details" v-if="selectedUser">
+        <div class="modal-user-details" v-if="selectedUser">
           <div class="details-section">
             <h4>基本信息</h4>
             <div class="detail-grid">
@@ -304,21 +273,6 @@
               <div class="detail-item">
                 <span class="label">最后登录IP：</span>
                 <span class="value">{{ maskIP(selectedUser.last_ip) }}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="details-section">
-            <h4>查询历史 (最近10条)</h4>
-            <div class="query-history">
-              <div v-if="userQueries.length === 0" class="no-queries">
-                <p>暂无查询记录</p>
-              </div>
-              <div v-else class="query-list">
-                <div v-for="query in userQueries" :key="query.id" class="query-item">
-                  <div class="query-domain">{{ query.domain }}</div>
-                  <div class="query-time">{{ formatDate(query.add_time) }}</div>
-                </div>
               </div>
             </div>
           </div>
@@ -419,7 +373,6 @@ const jumpPage = ref(1);
 
 // 用户详情相关
 const selectedUser = ref<any>(null);
-const userQueries = ref<any[]>([]);
 const userPreferences = ref<any[]>([]);
 
 // 消息状态
@@ -506,10 +459,6 @@ async function loadUsers() {
   }
 }
 
-async function refreshUsers() {
-  await loadUsers();
-}
-
 function handleSearch() {
   currentPage.value = 1; // 重置到第一页
 }
@@ -542,6 +491,13 @@ function getActiveUsers(): number {
 function clearSearch() {
   searchQuery.value = '';
   currentPage.value = 1;
+}
+
+function resetFilters() {
+  searchQuery.value = '';
+  userFilter.value = 'all';
+  currentPage.value = 1;
+  jumpPage.value = 1;
 }
 
 function handleFilterChange() {
@@ -591,28 +547,8 @@ async function viewUser(user: any) {
   selectedUser.value = user;
   showViewModal.value = true;
   
-  // 加载用户查询历史
-  await loadUserQueries(user.id);
-  
   // 加载用户偏好设置
   await loadUserPreferences(user.id);
-}
-
-async function loadUserQueries(userId: number) {
-  try {
-    const response = await fetch(`/api/admin/user/${userId}/queries`, {
-      credentials: 'include'
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      if (data.code === 200) {
-        userQueries.value = data.data || [];
-      }
-    }
-  } catch (error) {
-    console.error('Error loading user queries:', error);
-  }
 }
 
 async function loadUserPreferences(userId: number) {
@@ -716,7 +652,6 @@ function closeModals() {
   showViewModal.value = false;
   showEditModal.value = false;
   selectedUser.value = null;
-  userQueries.value = [];
   userPreferences.value = [];
   
   // 重置编辑表单
@@ -741,12 +676,12 @@ function maskIP(ip: string | undefined): string {
 </script>
 
 <style scoped>
+/* 管理页面样式 */
 .admin-users-page {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+  min-height: 100vh;
 }
 
+/* 权限检查状态 */
 .not-authenticated,
 .access-denied {
   text-align: center;
@@ -757,42 +692,28 @@ function maskIP(ip: string | undefined): string {
 }
 
 .users-container {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.stats-section {
-  padding: 1.5rem;
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border-color);
-  margin-bottom: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .stat-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 1.5rem;
+  border-radius: 6px;
+  padding: 0.75rem;
   text-align: center;
   transition: transform 0.2s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-}
-
-.stat-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+  transform: translateY(-1px);
 }
 
 .stat-info {
@@ -802,7 +723,7 @@ function maskIP(ip: string | undefined): string {
 }
 
 .stat-number {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: var(--primary-color);
   margin-bottom: 0.25rem;
@@ -810,9 +731,10 @@ function maskIP(ip: string | undefined): string {
 
 .stat-label {
   color: var(--text-color-light);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
+/* 搜索区域样式 */
 .search-section {
   background-color: var(--card-bg);
   border-radius: 8px;
@@ -822,49 +744,15 @@ function maskIP(ip: string | undefined): string {
   margin-bottom: 2rem;
 }
 
-.section-header {
+.search-controls-inline {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-}
-
-.section-title {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text-color);
-}
-
-.section-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.btn-refresh {
-  padding: 0.5rem 1rem;
-  background-color: var(--primary-color);
-  color: #111111;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s;
-}
-
-.btn-refresh:hover {
-  background-color: var(--hover-color);
-}
-
-.search-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .search-input-group {
   flex: 1;
-  max-width: 400px;
+  min-width: 280px;
   position: relative;
   display: flex;
   align-items: center;
@@ -901,11 +789,13 @@ function maskIP(ip: string | undefined): string {
   color: var(--text-color-light);
 }
 
-.search-filters {
+.filter-group {
   flex: 0 0 auto;
+  min-width: 150px;
 }
 
 .filter-select {
+  width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--border-color);
   border-radius: 4px;
@@ -919,58 +809,80 @@ function maskIP(ip: string | undefined): string {
   outline: none;
 }
 
-.list-section {
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border-color);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.list-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.list-count {
-  font-size: 0.9rem;
-  color: var(--text-color-light);
-  margin-left: 0.5rem;
-}
-
-.list-actions {
+.action-buttons-inline {
+  flex: 0 0 auto;
   display: flex;
   gap: 0.5rem;
 }
 
-.page-size-select {
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
+.btn-search {
+  padding: 0.75rem 1.25rem;
+  background-color: var(--primary-color);
+  color: #111111;
+  border: none;
   border-radius: 4px;
-  background-color: var(--input-bg);
-  color: var(--text-color);
   cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
 }
 
-.users-table-container {
-  overflow-x: auto;
-  margin-bottom: 1rem;
+.btn-search:hover:not(:disabled) {
+  background-color: var(--hover-color);
+  transform: translateY(-1px);
 }
 
+.btn-search:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-icon {
+  margin-right: 0.5rem;
+}
+
+.btn-reset {
+  padding: 0.75rem 1.25rem;
+  background-color: var(--primary-color);
+  color: #111111;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.btn-reset:hover:not(:disabled) {
+  background-color: var(--hover-color);
+  transform: translateY(-1px);
+}
+
+.btn-reset:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 表格样式 */
 .users-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.8rem;
+  background-color: var(--card-bg);
+  overflow-x: auto;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .users-table th {
@@ -980,14 +892,64 @@ function maskIP(ip: string | undefined): string {
   border-bottom: 2px solid var(--border-color);
   color: var(--text-color);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.users-table th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.users-table th:last-child {
+  border-top-right-radius: 8px;
+}
+
+.users-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+.users-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 8px;
 }
 
 .users-table td {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 0.5rem;
   color: var(--text-color);
   vertical-align: middle;
+  transition: background-color 0.2s ease;
+}
+
+/* 列宽度定义 */
+.col-id {
+  width: 6%;
+  min-width: 60px;
+}
+
+.col-user {
+  width: 40%;
+  min-width: 280px;
+}
+
+.col-time {
+  width: 18%;
+  min-width: 140px;
+}
+
+.col-activity {
+  width: 20%;
+  min-width: 160px;
+}
+
+.col-actions {
+  width: 16%;
+  min-width: 110px;
+  text-align: center;
+}
+
+.user-row {
+  border-bottom: 1px solid var(--border-color);
 }
 
 .user-row:hover {
@@ -996,26 +958,28 @@ function maskIP(ip: string | undefined): string {
 
 .user-id {
   font-weight: 600;
+  text-align: center;
 }
 
 .id-badge {
   background-color: var(--primary-color);
   color: #111111;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
+  display: inline-block;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .user-avatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background-color: var(--primary-color);
   display: flex;
@@ -1023,63 +987,86 @@ function maskIP(ip: string | undefined): string {
   align-items: center;
   color: #111111;
   font-weight: bold;
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .user-details {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 0.1rem;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.85rem;
 }
 
 .username {
-  font-weight: 500;
-  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-color);
+  white-space: nowrap;
+}
+
+.user-separator {
+  color: var(--text-color-light);
+  margin: 0 0.25rem;
 }
 
 .email {
   color: var(--text-color-light);
-  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
 .name {
   color: var(--text-color-light);
-  font-size: 0.85rem;
   font-style: italic;
+  white-space: nowrap;
 }
 
 .time-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
 }
 
-.date {
+.datetime {
   font-size: 0.9rem;
-}
-
-.time {
-  font-size: 0.8rem;
-  color: var(--text-color-light);
+  font-weight: 500;
+  color: var(--text-color);
 }
 
 .activity-info {
   display: flex;
+  align-items: center;
+}
+
+.activity-compact {
   flex-direction: column;
-  gap: 0.25rem;
+  align-items: flex-start;
+  gap: 0.3rem;
 }
 
 .activity-item {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
 }
 
 .activity-label {
   color: var(--text-color-light);
+  font-size: 0.75rem;
 }
 
 .activity-value {
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.activity-separator {
+  display: none;
 }
 
 .actions {
@@ -1088,21 +1075,21 @@ function maskIP(ip: string | undefined): string {
 
 .action-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.3rem;
   justify-content: center;
 }
 
 .btn-action {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
 }
 
 .btn-view {
@@ -1112,6 +1099,7 @@ function maskIP(ip: string | undefined): string {
 
 .btn-view:hover {
   background-color: #138496;
+  transform: translateY(-1px);
 }
 
 .btn-edit {
@@ -1121,6 +1109,7 @@ function maskIP(ip: string | undefined): string {
 
 .btn-edit:hover {
   background-color: var(--hover-color);
+  transform: translateY(-1px);
 }
 
 .btn-delete {
@@ -1130,6 +1119,7 @@ function maskIP(ip: string | undefined): string {
 
 .btn-delete:hover {
   background-color: #c82333;
+  transform: translateY(-1px);
 }
 
 .empty-state {
@@ -1403,7 +1393,7 @@ function maskIP(ip: string | undefined): string {
 }
 
 /* 用户详情样式 */
-.user-details {
+.modal-user-details {
   padding: 1.5rem;
 }
 
@@ -1444,27 +1434,23 @@ function maskIP(ip: string | undefined): string {
   flex: 1;
 }
 
-.query-history,
 .preferences {
   max-height: 300px;
   overflow-y: auto;
 }
 
-.no-queries,
 .no-preferences {
   text-align: center;
   padding: 2rem;
   color: var(--text-color-light);
 }
 
-.query-list,
 .preference-list {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.query-item,
 .preference-item {
   display: flex;
   justify-content: space-between;
@@ -1475,13 +1461,11 @@ function maskIP(ip: string | undefined): string {
   border: 1px solid var(--border-color);
 }
 
-.query-domain,
 .pref-key {
   font-weight: 500;
   color: var(--text-color);
 }
 
-.query-time,
 .pref-value {
   color: var(--text-color-light);
   font-size: 0.9rem;
@@ -1538,7 +1522,7 @@ function maskIP(ip: string | undefined): string {
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 1rem;
@@ -1583,8 +1567,37 @@ function maskIP(ip: string | undefined): string {
   border-color: var(--primary-color);
 }
 
-/* 响应式适配 */
+/* 响应式设计 */
 @media (max-width: 768px) {
+  .search-controls-inline {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .search-input-group {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .filter-group {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .action-buttons-inline {
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .btn-search,
+  .btn-reset {
+    flex: 1;
+    justify-content: center;
+    min-width: auto;
+  }
+
   .modal-content {
     width: 95%;
     margin: 1rem;
@@ -1609,11 +1622,97 @@ function maskIP(ip: string | undefined): string {
     flex-direction: column;
   }
   
-  .query-item,
   .preference-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
+  }
+  
+  .users-table {
+    font-size: 0.8rem;
+  }
+  
+  .users-table th,
+  .users-table td {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .col-time,
+  .col-activity,
+  .col-actions {
+    min-width: auto;
+  }
+  
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+  
+  .user-info {
+    gap: 0.5rem;
+  }
+  
+  .activity-compact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+  
+  .activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+  
+  .activity-separator {
+    display: none;
+  }
+  
+  .activity-label {
+    font-size: 0.75rem;
+  }
+  
+  .activity-value {
+    font-size: 0.8rem;
+  }
+  
+  .action-buttons {
+    gap: 0.3rem;
+  }
+  
+  .btn-action {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .users-table {
+    font-size: 0.75rem;
+  }
+  
+  .users-table th,
+  .users-table td {
+    padding: 0.5rem 0.3rem;
+  }
+  
+  .user-details {
+    gap: 0.1rem;
+  }
+  
+  .username {
+    font-size: 0.85rem;
+  }
+  
+  .email,
+  .name {
+    font-size: 0.75rem;
+  }
+  
+  .datetime {
+    font-size: 0.8rem;
   }
 }
 </style> 

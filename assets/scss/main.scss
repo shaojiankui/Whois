@@ -328,10 +328,11 @@ table {
     padding: 0.75rem;
     border-bottom: 1px solid var(--border-color);
   }
-  
+  tr{
+    border-bottom: 1px solid var(--border-color);
+  }
   td {
     padding: 0.75rem;
-    border-bottom: 1px solid var(--border-color);
   }
   
   tr:hover {
